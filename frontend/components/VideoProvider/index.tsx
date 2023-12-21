@@ -1,4 +1,3 @@
-// VideoContext.js
 import React, {
   createContext,
   useRef,
@@ -7,48 +6,19 @@ import React, {
   useContext,
   useEffect,
 } from "react";
-import { FaceApiContext } from "../FaceProvider"; // Import FaceApiContext
-import { FaceApiContextValue } from "../FaceProvider/index";
 
-export type VideoApiContextValue = {
-  videoRef: React.RefObject<HTMLVideoElement>;
-  handleCaptureClick: () => void;
-  detections: any;
-  isVideoReady: any;
-  handleVideoOnLoad: () => void;
-};
+import { FaceApiContext } from "../FaceProvider";
 
-export const VideoContext = createContext<VideoApiContextValue>({
-  videoRef: null,
-  handleCaptureClick: () => {},
-  detections: [],
-  isVideoReady: null,
-  handleVideoOnLoad: () => {},
-});
+export const VideoProvider = () => {
+  // const { isModelLoaded, faceapi } = useContext(VideoContext);
+  const FaceApiCtx = useContext(FaceApiContext);
+  const { isModelLoaded, faceapi } = FaceApiCtx as any;
 
-export const VideoProvider = ({ children }) => {
-  const { isModelLoaded, faceapi } =
-    useContext<FaceApiContextValue>(FaceApiContext); // Consume the FaceApiContext with the correct type
-
-  const videoRef = useRef<HTMLVideoElement>(null); // Provide the correct type for videoRef
-  const isVideoReady = useRef(false);
-  const [detections, setDetections] = useState([]);
-
-  // Function to handle video metadata loading
-  const handleVideoOnLoad = () => {
-    if (videoRef.current) {
-      isVideoReady.current = true;
-      console.log(
-        "Video dimensions:",
-        videoRef.current.videoWidth,
-        videoRef.current.videoHeight
-      );
-    }
-  };
+  const videoRef = useRef<HTMLVideoElement | null>(null);
 
   const startVideo = () => {
     navigator.mediaDevices
-      .getUserMedia({ video: {} })
+      .getUserMedia({ video: true })
       .then((stream) => {
         let video = videoRef.current;
         if (video) {
@@ -62,34 +32,17 @@ export const VideoProvider = ({ children }) => {
     startVideo();
   }, []);
 
-  const handleCaptureClick = useCallback(async () => {
-    console.log("isModelLoaded:", isModelLoaded);
-    if (isModelLoaded && videoRef.current && isVideoReady.current) {
-      console.log("Capturing image...");
-      // ... your face detection logic here ...
-      const options = new faceapi.TinyFaceDetectorOptions();
-      const detections = await faceapi
-        .detectAllFaces(videoRef.current, options)
-        .withFaceLandmarks()
-        .withFaceDescriptors();
-      console.log("Detections:", detections);
-      setDetections(detections);
-    }
-  }, [isModelLoaded, faceapi]);
-
-  // You would also need functions to handle video startup, etc.
-
   return (
-    <VideoContext.Provider
-      value={{
-        videoRef,
-        handleCaptureClick,
-        detections,
-        isVideoReady,
-        handleVideoOnLoad,
-      }}
-    >
-      {children}
-    </VideoContext.Provider>
+    <>
+      {/* Add video element */}
+      <video
+        ref={videoRef}
+        autoPlay
+        playsInline
+        muted={true} // Mute the video if needed
+        style={{ width: "100%", height: "auto", border: "1px solid #00BBB0" }}
+        className="rounded-xl"
+      />
+    </>
   );
 };

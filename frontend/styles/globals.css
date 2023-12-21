@@ -303,6 +303,22 @@ a {
   /* border: 1px solid #78d5a2; */
 }
 
+.capture-button {
+  border-radius: 12px;
+  /* background: #78d5a2; */
+  background: rgb(43, 94, 74);
+
+  /* font-weight: 700; */
+  /* font-family: "Poppins-SemiBold"; */
+  /* box-shadow: 0px 3px 18px 0px rgba(243, 191, 66, 0.5),
+    0px 2px 16px 0px rgba(243, 191, 66, 0.4); */
+  display: flex;
+  /* padding: 10px 50px; */
+  align-items: center;
+  gap: 10px;
+  /* border: 1px solid #78d5a2; */
+}
+
 .deposit-disabled-button {
   border-radius: 12px;
   /* background: #78d5a2; */
