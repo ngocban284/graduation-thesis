@@ -77,8 +77,9 @@ export const Header: FC<HeaderProps> = (props: HeaderProps) => {
             href="/"
             className="text-lg font-bold rounded-lg tracking-widest focus:outline-none focus:shadow-outline"
           >
-            <h1 className="text-4xl Avenir tracking-tighter text-white md:text-4x1 lg:text-3xl">
-              <Logo />
+            <h1 className="text-base font-light flex flex-row gap-3 Avenir tracking-tighter text-white md:text-4x1 lg:text-3xl">
+              <img className="w-[20%]" src="/images/logo.png" />
+              <div className="my-auto mt-3 text-xl">SafeChest</div>
             </h1>
           </a>
         </div>

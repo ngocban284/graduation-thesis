@@ -335,6 +335,12 @@ a {
   /* border: 1px solid #78d5a2; */
 }
 
+.home-context {
+  background: linear-gradient(90deg, #01e47b 0%, #03c3f0 100%);
+  background-clip: text;
+  color: transparent;
+}
+
 .percent-btn:hover {
   background: linear-gradient(90deg, #01e47b 0%, #03c3f0 100%);
 }
@@ -385,12 +391,6 @@ input::-webkit-inner-spin-button {
   /* background: rgba(255, 255, 255, 1); */
 
   background: rgba(21, 23, 33, 0.3);
-}
-
-.home-context {
-  background: linear-gradient(to right, #00796d, #38c682);
-  background-clip: text;
-  color: transparent;
 }
 
 .countdown {

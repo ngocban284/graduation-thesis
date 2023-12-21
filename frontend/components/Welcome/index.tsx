@@ -12,8 +12,7 @@ import { ItemFifth } from "./ItemFifth";
 import { ItemSeventh } from "./ItemSeventh";
 import { Deposit } from "../Deposit";
 import { Withdraw } from "../Withdraw";
-import { VideoContext } from "../VideoProvider";
-import { VideoProvider } from "../VideoProvider";
+
 import { FaceRegistry } from "../FaceRegistry";
 import { FaceRecovery } from "../FaceRecovery";
 import {
@@ -47,6 +46,7 @@ export const Welcome: FC<WelcomeProps> = () => {
     withdraw: false,
     registry: true,
     recovery: false,
+    info: false,
   });
 
   const handleCollapse = (button) => {
@@ -56,6 +56,7 @@ export const Welcome: FC<WelcomeProps> = () => {
         withdraw: false,
         registry: false,
         recovery: false,
+        info: false,
       });
     } else if (button === "withdraw") {
       setVisibility({
@@ -63,6 +64,7 @@ export const Welcome: FC<WelcomeProps> = () => {
         withdraw: true,
         registry: false,
         recovery: false,
+        info: false,
       });
     } else if (button === "registry") {
       setVisibility({
@@ -70,6 +72,7 @@ export const Welcome: FC<WelcomeProps> = () => {
         withdraw: false,
         registry: true,
         recovery: false,
+        info: false,
       });
     } else if (button === "recovery") {
       setVisibility({
@@ -77,6 +80,15 @@ export const Welcome: FC<WelcomeProps> = () => {
         withdraw: false,
         registry: false,
         recovery: true,
+        info: false,
+      });
+    } else if (button === "info") {
+      setVisibility({
+        deposit: false,
+        withdraw: false,
+        registry: false,
+        recovery: false,
+        info: true,
       });
     }
   };
@@ -122,8 +134,8 @@ export const Welcome: FC<WelcomeProps> = () => {
             "relative mt-10 lg:mt-0 flex flex-col justify-center   items-center text-center  gap-12 w-1/3 mx-auto",
           ].join(" ")}
         >
-          <div className="md:text-4xl text-3xl whitespace-nowrap font-medium">
-            Safe Chest
+          <div className="md:text-4xl text-3xl whitespace-nowrap font-medium home-context">
+            Absolutely protect your assets with zk technology
           </div>
           <div
             className="text-xl md:text-5xl flex"
@@ -134,7 +146,7 @@ export const Welcome: FC<WelcomeProps> = () => {
           >
             <div
               className={[
-                " md:text-xl text-base cursor-pointer text-center items-center justify-center flex-1",
+                " md:text-base text-base cursor-pointer text-center items-center justify-center flex-1",
                 visibility.deposit ? "active-button" : "disabled-btn",
               ].join(" ")}
               onClick={() => handleCollapse("deposit")}
@@ -143,7 +155,7 @@ export const Welcome: FC<WelcomeProps> = () => {
             </div>
             <div
               className={[
-                " md:text-xl text-base text-center cursor-pointer items-center justify-center flex-1",
+                " md:text-base text-base text-center cursor-pointer items-center justify-center flex-1",
                 visibility.withdraw ? "active-button" : "disabled-btn",
               ].join(" ")}
               onClick={() => handleCollapse("withdraw")}
@@ -152,21 +164,30 @@ export const Welcome: FC<WelcomeProps> = () => {
             </div>
             <div
               className={[
-                " md:text-xl text-base text-center cursor-pointer items-center justify-center flex-1",
+                " md:text-base text-base text-center cursor-pointer items-center justify-center flex-1",
                 visibility.registry ? "active-button" : "disabled-btn",
               ].join(" ")}
               onClick={() => handleCollapse("registry")}
             >
-              WalletRegistry
+              Registry
             </div>
             <div
               className={[
-                " md:text-xl text-base text-center cursor-pointer items-center justify-center flex-1",
+                " md:text-base text-base text-center cursor-pointer items-center justify-center flex-1",
                 visibility.recovery ? "active-button" : "disabled-btn",
               ].join(" ")}
               onClick={() => handleCollapse("recovery")}
             >
-              WalletRecovery
+              Recovery
+            </div>
+            <div
+              className={[
+                " md:text-base text-base text-center cursor-pointer items-center justify-center flex-1",
+                visibility.info ? "active-button" : "disabled-btn",
+              ].join(" ")}
+              onClick={() => handleCollapse("info")}
+            >
+              MyChest
             </div>
           </div>
         </div>

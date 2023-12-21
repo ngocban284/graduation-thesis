@@ -6,6 +6,7 @@ interface FaceProps {}
 
 export const FaceRegistry: FC<FaceProps> = () => {
   const [isModelLoaded, setIsModelLoaded] = useState(false);
+  const [detections, setDetections] = useState<any>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const isVideoReady = useRef(false);
 
@@ -42,6 +43,8 @@ export const FaceRegistry: FC<FaceProps> = () => {
           progress: undefined,
           theme: "dark",
         });
+
+        setDetections(detections);
       } else {
         toast.error("No face detected", {
           position: "top-right",
@@ -77,7 +80,7 @@ export const FaceRegistry: FC<FaceProps> = () => {
       <div className=" md:w-[50%] w-[95%]  mx-auto ">
         <div className="text-white flex flex-col gap-4  my-24  border-features py-8">
           <div className="w-[90%] flex flex-col justify-center items-center text-center gap-12 mx-auto">
-            <div className="flex flex-row w-full gap-8">
+            <div className="flex xl:flex-row lg:flex-col md:flex-col  flex-col w-full gap-8">
               <div className="flex flex-col w-full gap-3">
                 <div className="text-left">First proof question :</div>
                 <input
