@@ -1,9 +1,26 @@
-import React, { FC } from "react";
-import { VideoProvider } from "../VideoProvider";
-
+import React, { FC, useContext, useState, useEffect } from "react";
+import * as faceapi from "face-api.js";
+import { VideoContext } from "../VideoProvider";
 interface FaceProps {}
 
 export const FaceRegistry: FC<FaceProps> = () => {
+  // const { handleCaptureClick, detections } = useContext(VideoContext);
+
+  const [isModelLoaded, setIsModelLoaded] = useState(false);
+
+  useEffect(() => {
+    console.log("FaceRegistry");
+    const loadModels = async () => {
+      await faceapi.nets.tinyFaceDetector.loadFromUri("../../models");
+      await faceapi.nets.faceLandmark68Net.loadFromUri("../../models");
+      await faceapi.nets.faceRecognitionNet.loadFromUri("../../models");
+      setIsModelLoaded(true);
+      console.log("Models loaded");
+    };
+
+    loadModels().catch(console.error);
+  }, []);
+
   return (
     <>
       <div className=" md:w-[50%] w-[95%]  mx-auto ">
@@ -47,9 +64,7 @@ export const FaceRegistry: FC<FaceProps> = () => {
 
             <div className="flex flex-col w-full gap-3">
               <div className="text-left">Face Proof :</div>
-              <div className="text-xl">
-                <VideoProvider />
-              </div>
+              <div className="text-xl">{/* <VideoProvider /> */}</div>
             </div>
 
             <div

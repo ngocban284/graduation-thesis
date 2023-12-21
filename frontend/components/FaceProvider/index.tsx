@@ -7,11 +7,23 @@ import React, {
 } from "react";
 import * as faceapi from "face-api.js";
 
-export const FaceApiContext = createContext({});
+// Define the type for the FaceApiContext value
+export type FaceApiContextValue = {
+  isModelLoaded: boolean;
+  faceapi: typeof faceapi;
+};
 
+// Create the context with an initial empty object
+export let FaceApiContext = createContext<FaceApiContextValue>({
+  isModelLoaded: false,
+  faceapi: faceapi,
+});
+
+// Define the props type for FaceApiProvider
 export type FaceProps = PropsWithChildren<{}>;
 
-export const FaceApiProvider = ({ children }) => {
+// Define the component with the provided types
+export const FaceApiProvider: FC<FaceProps> = ({ children }) => {
   const [isModelLoaded, setIsModelLoaded] = useState(false);
 
   useEffect(() => {
@@ -26,8 +38,11 @@ export const FaceApiProvider = ({ children }) => {
     loadModels().catch(console.error);
   }, []);
 
+  // Use the defined type for the context value
+  const contextValue: FaceApiContextValue = { isModelLoaded, faceapi };
+
   return (
-    <FaceApiContext.Provider value={{ isModelLoaded, faceapi }}>
+    <FaceApiContext.Provider value={contextValue}>
       {children}
     </FaceApiContext.Provider>
   );
