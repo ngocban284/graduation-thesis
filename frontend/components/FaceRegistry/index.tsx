@@ -34,6 +34,8 @@ export const FaceRegistry: FC<FaceProps> = () => {
         .withFaceDescriptors();
 
       console.log("detections", detections[0]);
+      // backup detection[0].descriptor json file
+
       if (detections.length > 0) {
         toast.success("Face detected", {
           position: "top-right",
