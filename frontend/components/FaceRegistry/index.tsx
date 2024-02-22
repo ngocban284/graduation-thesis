@@ -2,6 +2,7 @@ import React, { FC, useContext, useState, useEffect, useRef } from "react";
 import * as faceapi from "face-api.js";
 import { is } from "@react-spring/shared";
 import { toast } from "react-toastify";
+import ReedSolomonEC from "../../fuzzy_commitment_js/ErrorCorrection";
 interface FaceProps {}
 
 export const FaceRegistry: FC<FaceProps> = () => {
@@ -9,6 +10,8 @@ export const FaceRegistry: FC<FaceProps> = () => {
   const [detections, setDetections] = useState<any>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const isVideoReady = useRef(false);
+
+  const RS_EC = new ReedSolomonEC();
 
   const startVideo = () => {
     navigator.mediaDevices
@@ -47,6 +50,13 @@ export const FaceRegistry: FC<FaceProps> = () => {
         });
 
         setDetections(detections);
+
+        const { commitment, featureVectorHash } = await RS_EC.fuzzyCommitment(
+          detections[0].descriptor
+        );
+
+        // console.log("commitment", commitment);
+        // console.log("featureVectorHash", featureVectorHash);
       } else {
         toast.error("No face detected", {
           position: "top-right",

@@ -1,13 +1,14 @@
 // import { buildPoseidon } from 'circomlibjs';
 const { buildPoseidon } = require("circomlibjs");
-const { getRandomValues } = require("crypto");
+const { ethers } = require("ethers");
 // import { parse } from 'marked';
 // const bigInt = require("big-integer");
 
+const crypto = require("crypto");
+
 const generateRandomSecret = (length) => {
-  var secret = new Uint8Array(length);
-  getRandomValues(secret);
-  return secret;
+  var secret = crypto.randomBytes(length);
+  return new Uint8Array(secret);
 };
 
 const binaryQuantize = (value) => {
@@ -19,12 +20,12 @@ const binaryQuantize = (value) => {
 };
 
 const padArray = (arr, size, paddingValue) => {
+  console.log("arr", arr);
   var result = new Uint8Array(size);
   result.set(arr);
   for (var i = arr.length; i < size; i++) {
     result[i] = paddingValue;
   }
-  console.log("cc");
   return result;
 };
 

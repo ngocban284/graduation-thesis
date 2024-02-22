@@ -1,7 +1,6 @@
 const rs = require("./ReedSolomons");
 const helper = require("./Helpers");
-const feat_vector_raw = require("./feat_vector_raw.json");
-const { writeFileSync } = require("fs");
+const crypto = require("crypto");
 
 class ReedSolomonEC {
   // Define all Constants
@@ -37,25 +36,33 @@ class ReedSolomonEC {
 
   async fuzzyCommitment(feat_vec) {
     feat_vec = feat_vec.map((value) => helper.binaryQuantize(value));
-    console.log(`Quantized Descriptor for face:`, feat_vec);
+    console.log(`Quantized Descriptor for face:`, feat_vec.length);
+
+    // var s0 = crypto.getRandomValues(
+    //   new Uint8Array(ReedSolomonEC.SECRET_LENGTH)
+    // );
 
     var s = helper.generateRandomSecret(ReedSolomonEC.SECRET_LENGTH);
     console.log("Secret", s);
+
     var packet = new Uint8Array(this.ec.messageLength);
     s.forEach((byte, i) => (packet[i] = byte));
 
     console.log("Packet before encoding", packet);
 
     this.ec.encode(packet);
+
     console.log("Packet after encoding", packet);
+
     var paddedFeatVec = helper.padArray(feat_vec, packet.length, 0);
     console.log("Padded Feature Vector", paddedFeatVec);
+
     var c = helper.xor(paddedFeatVec, packet);
     var commitment = new Uint8Array(c);
     console.log("Commitment", commitment);
     var h_w = await helper.poseidon128Hash(packet);
     // var h_w = new Uint8Array(hashBuffer);
-    console.log("commitment Hash", h_w);
+    // console.log("commitment Hash", h_w);
     var feature_vec_hash = await helper.poseidon128Hash(feat_vec);
     return { commitment: commitment, featureVectorHash: feature_vec_hash };
   }
