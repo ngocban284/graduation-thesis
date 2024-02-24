@@ -8,6 +8,10 @@ interface FaceProps {}
 export const FaceRegistry: FC<FaceProps> = () => {
   const [isModelLoaded, setIsModelLoaded] = useState(false);
   const [detections, setDetections] = useState<any>(null);
+  const [persionalData, setPersionalData] = useState<any>({
+    question: "",
+    answer: "",
+  });
   const videoRef = useRef<HTMLVideoElement>(null);
   const isVideoReady = useRef(false);
 
@@ -26,6 +30,13 @@ export const FaceRegistry: FC<FaceProps> = () => {
       })
       .catch((err) => console.error("Error accessing camera:", err));
   };
+  const handlePersionalQuestion = (e) => {
+    setPersionalData({ ...persionalData, question: e.target.value });
+  };
+
+  const handlePersionalAnswer = (e) => {
+    setPersionalData({ ...persionalData, answer: e.target.value });
+  };
 
   const handleRegistry = async () => {
     if (isVideoReady.current && videoRef.current && isModelLoaded) {
@@ -39,7 +50,11 @@ export const FaceRegistry: FC<FaceProps> = () => {
       console.log("detections", detections[0]);
       // backup detection[0].descriptor json file
 
-      if (detections.length > 0) {
+      if (
+        detections.length > 0 &&
+        persionalData.question != "" &&
+        persionalData.answer != ""
+      ) {
         toast.success("Face detected", {
           position: "top-right",
           autoClose: 5000,
@@ -92,38 +107,29 @@ export const FaceRegistry: FC<FaceProps> = () => {
       <div className=" md:w-[50%] w-[95%]  mx-auto ">
         <div className="text-white flex flex-col gap-4  my-24  border-features py-8">
           <div className="w-[90%] flex flex-col justify-center items-center text-center gap-12 mx-auto">
-            <div className="flex xl:flex-row lg:flex-col md:flex-col  flex-col w-full gap-8">
+            <div className="flex xl:flex-col lg:flex-col md:flex-col  flex-col w-full gap-8">
               <div className="flex flex-col w-full gap-3">
-                <div className="text-left">First proof question :</div>
+                <div className="text-left">Proof question :</div>
                 <input
                   className=" bg-transparent rounded-md px-4 py-3"
-                  placeholder="first question"
-                  type="password"
+                  placeholder="question"
+                  type=""
                   style={{
                     background: "#142631",
                   }}
+                  onChange={(e) => handlePersionalQuestion(e)}
                 />
               </div>
               <div className="flex flex-col w-full gap-3">
-                <div className="text-left">Second proof question :</div>
+                <div className="text-left">Proof answer :</div>
                 <input
                   className=" bg-transparent rounded-md px-4 py-3"
-                  placeholder="second question"
+                  placeholder="answer"
                   type="password"
                   style={{
                     background: "#142631",
                   }}
-                />
-              </div>
-              <div className="flex flex-col w-full gap-3">
-                <div className="text-left">Third proof question :</div>
-                <input
-                  className=" bg-transparent rounded-md px-4 py-3"
-                  placeholder="third question"
-                  type="password"
-                  style={{
-                    background: "#142631",
-                  }}
+                  onChange={(e) => handlePersionalAnswer(e)}
                 />
               </div>
             </div>
