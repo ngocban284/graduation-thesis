@@ -9,11 +9,10 @@ import styles from "./index.module.css";
 import { Logo } from "./Logo";
 import { EthLogo } from "./ETH";
 import {
-  Goerli,
-  Mainnet,
   shortenIfAddress,
   useEtherBalance,
   useEthers,
+  BSCTestnet,
 } from "@usedapp/core";
 
 import { ethers } from "ethers";
@@ -36,7 +35,7 @@ export const Header: FC<HeaderProps> = (props: HeaderProps) => {
 
   useEffect(() => {
     if (!chainId) {
-      switchNetwork(Goerli.chainId).then(() => activateBrowserWallet());
+      switchNetwork(BSCTestnet.chainId).then(() => activateBrowserWallet());
     }
   }, [chainId]);
 
@@ -100,7 +99,7 @@ export const Header: FC<HeaderProps> = (props: HeaderProps) => {
               <>
                 <div className="text-center">chain</div>
               </>
-            ) : chainId == 1 ? (
+            ) : chainId == 97 ? (
               <>
                 <div className="relative group my-auto">
                   <div
@@ -108,7 +107,7 @@ export const Header: FC<HeaderProps> = (props: HeaderProps) => {
                     onClick={() => handleShowNetwork()}
                   >
                     <div>
-                      <EthLogo />
+                      <BnbItem />
                     </div>
                     <div>
                       <svg
@@ -148,7 +147,7 @@ export const Header: FC<HeaderProps> = (props: HeaderProps) => {
                         </div>
                         <div className="flex flex-row gap-2">
                           <BnbItem />
-                          <div className="my-auto">BSC (comming soon)</div>
+                          <div className="my-auto">BSC </div>
                         </div>
                       </div>
                     </div>

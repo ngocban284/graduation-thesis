@@ -1,11 +1,33 @@
+// @ts-nocheck
 import React, { FC, useContext, useState, useEffect, useRef } from "react";
 import * as faceapi from "face-api.js";
 import { is } from "@react-spring/shared";
 import { toast } from "react-toastify";
 import ReedSolomonEC from "../../fuzzy_commitment_js/ErrorCorrection";
+import {
+  sha256HasherToBigInt,
+  poseidonHash,
+} from "../../fuzzy_commitment_js/Helpers";
+
+import { FuzzyCommitmentAbi } from "../../abis/FuzzyCommitment";
+import { FUZZY_COMMITMENT_ADDRESS } from "../../constants/index";
+
+import { useContractByAddress } from "../../hooks/use-contract";
+import { useEthers, BSCTestnet } from "@usedapp/core";
+import { getDefaultProvider } from "ethers";
+
 interface FaceProps {}
 
 export const FaceRegistry: FC<FaceProps> = () => {
+  const { switchNetwork, chainId, account, deactivate, activateBrowserWallet } =
+    useEthers();
+
+  useEffect(() => {
+    if (!chainId) {
+      switchNetwork(BSCTestnet.chainId).then(() => activateBrowserWallet());
+    }
+  }, [chainId]);
+
   const [isModelLoaded, setIsModelLoaded] = useState(false);
   const [detections, setDetections] = useState<any>(null);
   const [persionalData, setPersionalData] = useState<any>({
@@ -66,12 +88,32 @@ export const FaceRegistry: FC<FaceProps> = () => {
 
         setDetections(detections);
 
+        // start fuzzy commitment process
         const { commitment, featureVectorHash } = await RS_EC.fuzzyCommitment(
           detections[0].descriptor
         );
 
         // console.log("commitment", commitment);
         // console.log("featureVectorHash", featureVectorHash);
+
+        // concat persionalData.question and persionalData.answer to one string
+        const persionalDataConcat =
+          persionalData.question + persionalData.answer;
+
+        // convert persionalDataConcat str to BigInt
+        const persionalDataHash = await sha256HasherToBigInt(
+          persionalDataConcat
+        );
+        // console.log("persionalDataHash", persionalDataHash);
+
+        const persionalPoseidonHash = await poseidonHash([persionalDataHash]);
+
+        const fuzzyCommitmentContract = useContractByAddress(
+          FUZZY_COMMITMENT_ADDRESS,
+          FuzzyCommitmentAbi
+        );
+
+        // console.log("persionalPoseidonHash", persionalPoseidonHash);
       } else {
         toast.error("No face detected", {
           position: "top-right",

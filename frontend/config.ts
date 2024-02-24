@@ -21,8 +21,6 @@ export const PAYMENT_ADDRESS = ""; // testnet goerli
 export const ETH_ADDRESS = "0x0000000000000000000000000000000000000000";
 export const PAIR_TOKEN_ADDRESS = "";
 
-import { Goerli, Mainnet } from "@usedapp/core";
-
 export type AppConfig = {
   abis: {
     [name: string]: any;
@@ -41,16 +39,5 @@ export const config: AppConfig = {
     Payment: require("./abis/Payment").Payment,
   },
 
-  addresses: {
-    [Mainnet.chainId]: {
-      Token: TOKEN_ADDRESS_MAINNET,
-
-      Payment: PAYMENT_ADDRESS,
-    },
-    [Goerli.chainId]: {
-      Token: TOKEN_ADDRESS_TESTNET,
-
-      Payment: PAYMENT_ADDRESS,
-    },
-  },
+  addresses: {},
 };

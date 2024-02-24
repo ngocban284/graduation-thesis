@@ -1,13 +1,13 @@
 import React from "react";
 
-import { Mainnet, DAppProvider, Goerli } from "@usedapp/core";
+import { DAppProvider, BSCTestnet } from "@usedapp/core";
 // import { getDefaultProvider } from "ethers";
 
 const config = {
-  readOnlyChainId: Mainnet.chainId,
+  readOnlyChainId: BSCTestnet.chainId,
   readOnlyUrls: {
-    [Mainnet.chainId]: "https://eth.meowrpc.com",
-    [Goerli.chainId]: "https://ethereum-goerli.publicnode.com",
+    [421614]: "https://sepolia-rollup.arbitrum.io/rpc",
+    [BSCTestnet.chainId]: "https://data-seed-prebsc-2-s2.bnbchain.org:8545/",
   },
 };
 

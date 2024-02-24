@@ -2,11 +2,10 @@ import { ethers } from "ethers";
 import { useMemo, useEffect, useState } from "react";
 
 import {
-  Goerli,
-  Mainnet,
   shortenIfAddress,
   useEtherBalance,
   useEthers,
+  BSCTestnet,
 } from "@usedapp/core";
 
 import { EthItem } from "../Util/eth";
@@ -23,7 +22,7 @@ export const Deposit = () => {
 
   useEffect(() => {
     if (!chainId) {
-      switchNetwork(Goerli.chainId).then(() => activateBrowserWallet());
+      switchNetwork(BSCTestnet.chainId).then(() => activateBrowserWallet());
     }
   }, [chainId]);
   const balanceHex = useEtherBalance(account);

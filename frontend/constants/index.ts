@@ -1,0 +1,2 @@
+export const FUZZY_COMMITMENT_ADDRESS =
+  "0xc919124e2def8baf424f4e4c52a5076349705bf3";

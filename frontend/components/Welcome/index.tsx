@@ -16,11 +16,10 @@ import { Withdraw } from "../Withdraw";
 import { FaceRegistry } from "../FaceRegistry";
 import { FaceRecovery } from "../FaceRecovery";
 import {
-  Goerli,
-  Mainnet,
   shortenIfAddress,
   useEtherBalance,
   useEthers,
+  BSCTestnet,
 } from "@usedapp/core";
 //  use react spring for animation
 import { useSpring, animated } from "react-spring";
@@ -37,7 +36,7 @@ export const Welcome: FC<WelcomeProps> = () => {
 
   useEffect(() => {
     if (!chainId) {
-      switchNetwork(Goerli.chainId).then(() => activateBrowserWallet());
+      switchNetwork(BSCTestnet.chainId).then(() => activateBrowserWallet());
     }
   }, [chainId]);
 

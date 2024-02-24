@@ -3,6 +3,7 @@
     "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": true,
     "skipLibCheck": true,
+    "checkJs": false,
     "strict": false,
     "noEmit": true,
     "incremental": true,
@@ -14,6 +15,11 @@
     "jsx": "preserve",
     "types": ["node"]
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"],
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    "./fuzzy_commitment_js/*.js"
+  ],
   "exclude": ["node_modules"]
 }

@@ -1,6 +1,7 @@
 // import { buildPoseidon } from 'circomlibjs';
 const { buildPoseidon } = require("circomlibjs");
 const { ethers } = require("ethers");
+var sha256 = require("js-sha256").sha256;
 // import { parse } from 'marked';
 // const bigInt = require("big-integer");
 
@@ -85,7 +86,7 @@ const sha256ToBigInt = async (str) => {
   const data = encoder.encode(str);
 
   // Calculate the SHA-256 hash
-  const hashBuffer = await window.crypto.subtle.digest("SHA-256", data);
+  const hashBuffer = await crypto.subtle.digest("SHA-256", data);
 
   // Convert the hash to a hexadecimal string
   const hashArray = Array.from(new Uint8Array(hashBuffer));
@@ -99,6 +100,15 @@ const sha256ToBigInt = async (str) => {
   return BigInt(hashBigInt);
 };
 
+const sha256HasherToBigInt = async (str) => {
+  const hashed = sha256(str);
+
+  //  convert the hash to a BigInt
+  const hashBigInt = "0x" + hashed;
+
+  return BigInt(hashBigInt);
+};
+
 module.exports = {
   generateRandomSecret,
   binaryQuantize,
@@ -108,4 +118,5 @@ module.exports = {
   poseidonHash,
   generateRandom128Bit,
   sha256ToBigInt,
+  sha256HasherToBigInt,
 };
