@@ -1,46 +1,49 @@
-import React, { FC } from "react";
+// @ts-nocheck
+import React, {
+  FC,
+  useContext,
+  useState,
+  useEffect,
+  useRef,
+  useMemo,
+} from "react";
 import { VideoProvider } from "../VideoProvider";
 
 interface FaceProps {}
 
 export const FaceRecovery: FC<FaceProps> = () => {
+  const [persionalData, setPersionalData] = useState<any>({
+    question: "",
+    answer: "",
+  });
   return (
     <>
       <div className=" md:w-[50%] w-[95%]  mx-auto ">
         <div className="text-white flex flex-col gap-4  my-24  border-features py-8">
           <div className="w-[90%] flex flex-col justify-center items-center text-center gap-12 mx-auto">
-            <div className="flex flex-row w-full gap-8">
+            <div className="flex xl:flex-col lg:flex-col md:flex-col  flex-col w-full gap-8">
               <div className="flex flex-col w-full gap-3">
-                <div className="text-left">First proof question :</div>
+                <div className="text-left">Proof question :</div>
                 <input
                   className=" bg-transparent rounded-md px-4 py-3"
-                  placeholder="first question"
-                  type="password"
+                  placeholder="question"
+                  type=""
                   style={{
                     background: "#142631",
                   }}
+                  onChange={(e) => handlePersionalQuestion(e)}
                 />
               </div>
               <div className="flex flex-col w-full gap-3">
-                <div className="text-left">Second proof question :</div>
+                <div className="text-left">Proof answer :</div>
                 <input
                   className=" bg-transparent rounded-md px-4 py-3"
-                  placeholder="second question"
+                  placeholder="answer"
                   type="password"
                   style={{
                     background: "#142631",
                   }}
-                />
-              </div>
-              <div className="flex flex-col w-full gap-3">
-                <div className="text-left">Third proof question :</div>
-                <input
-                  className=" bg-transparent rounded-md px-4 py-3"
-                  placeholder="third question"
-                  type="password"
-                  style={{
-                    background: "#142631",
-                  }}
+                  onChange={(e) => handlePersionalAnswer(e)}
                 />
               </div>
             </div>

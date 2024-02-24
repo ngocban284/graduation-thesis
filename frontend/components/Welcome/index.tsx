@@ -134,7 +134,7 @@ export const Welcome: FC<WelcomeProps> = () => {
           ].join(" ")}
         >
           <div className="md:text-4xl text-3xl whitespace-nowrap font-medium home-context">
-            Absolutely protect your assets with zk technology
+            Private payment solution using ZKP
           </div>
           <div
             className="text-xl md:text-5xl flex"
@@ -145,7 +145,7 @@ export const Welcome: FC<WelcomeProps> = () => {
           >
             <div
               className={[
-                " md:text-base text-base cursor-pointer text-center items-center justify-center flex-1",
+                " md:text-base text-base cursor-pointer text-center items-center justify-center flex-1 whitespace-nowrap",
                 visibility.deposit ? "active-button" : "disabled-btn",
               ].join(" ")}
               onClick={() => handleCollapse("deposit")}
@@ -154,30 +154,30 @@ export const Welcome: FC<WelcomeProps> = () => {
             </div>
             <div
               className={[
-                " md:text-base text-base text-center cursor-pointer items-center justify-center flex-1",
+                " md:text-base text-base text-center cursor-pointer items-center justify-center flex-1 whitespace-nowrap",
                 visibility.withdraw ? "active-button" : "disabled-btn",
               ].join(" ")}
               onClick={() => handleCollapse("withdraw")}
             >
-              Withdraw
+              ZK-Withdraw
             </div>
             <div
               className={[
-                " md:text-base text-base text-center cursor-pointer items-center justify-center flex-1",
+                " md:text-base text-base text-center cursor-pointer items-center justify-center flex-1 whitespace-nowrap",
                 visibility.registry ? "active-button" : "disabled-btn",
               ].join(" ")}
               onClick={() => handleCollapse("registry")}
             >
-              Registry
+              ZK-Registry
             </div>
             <div
               className={[
-                " md:text-base text-base text-center cursor-pointer items-center justify-center flex-1",
+                " md:text-base text-base text-center cursor-pointer items-center justify-center flex-1 whitespace-nowrap",
                 visibility.recovery ? "active-button" : "disabled-btn",
               ].join(" ")}
               onClick={() => handleCollapse("recovery")}
             >
-              Recovery
+              ZK-Recovery
             </div>
             <div
               className={[

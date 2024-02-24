@@ -1,5 +1,12 @@
 // @ts-nocheck
-import React, { FC, useContext, useState, useEffect, useRef } from "react";
+import React, {
+  FC,
+  useContext,
+  useState,
+  useEffect,
+  useRef,
+  useMemo,
+} from "react";
 import * as faceapi from "face-api.js";
 import { is } from "@react-spring/shared";
 import { toast } from "react-toastify";
@@ -13,8 +20,12 @@ import { FuzzyCommitmentAbi } from "../../abis/FuzzyCommitment";
 import { FUZZY_COMMITMENT_ADDRESS } from "../../constants/index";
 
 import { useContractByAddress } from "../../hooks/use-contract";
-import { useEthers, BSCTestnet } from "@usedapp/core";
-import { getDefaultProvider } from "ethers";
+import {
+  useEthers,
+  BSCTestnet,
+  useCall,
+  useContractFunction,
+} from "@usedapp/core";
 
 interface FaceProps {}
 
@@ -34,6 +45,17 @@ export const FaceRegistry: FC<FaceProps> = () => {
     question: "",
     answer: "",
   });
+
+  const fuzzyCommitmentContract = useContractByAddress(
+    FUZZY_COMMITMENT_ADDRESS,
+    FuzzyCommitmentAbi
+  );
+
+  const registryFunc = useContractFunction(
+    fuzzyCommitmentContract,
+    "registerForRecovery"
+  );
+
   const videoRef = useRef<HTMLVideoElement>(null);
   const isVideoReady = useRef(false);
 
@@ -108,10 +130,33 @@ export const FaceRegistry: FC<FaceProps> = () => {
 
         const persionalPoseidonHash = await poseidonHash([persionalDataHash]);
 
-        const fuzzyCommitmentContract = useContractByAddress(
-          FUZZY_COMMITMENT_ADDRESS,
-          FuzzyCommitmentAbi
-        );
+        const registryParams = [
+          featureVectorHash,
+          persionalPoseidonHash,
+          Array.from(commitment),
+        ];
+
+        const tx = await registryFunc.send(...registryParams);
+
+        if (tx.status == 1) {
+          toast.success("Face Registry Success", {
+            position: "top-right",
+            autoClose: 5000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            progress: undefined,
+            theme: "dark",
+          });
+        } else {
+          toast.error("Face Registry Failed", {
+            position: "top-right",
+            autoClose: 5000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            progress: undefined,
+            theme: "dark",
+          });
+        }
 
         // console.log("persionalPoseidonHash", persionalPoseidonHash);
       } else {
