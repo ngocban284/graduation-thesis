@@ -1,9 +1,22 @@
+import { useState, useEffect } from "react";
+import { ethers } from "ethers";
 import { EthItem } from "../Util/eth";
 import { BnbItem } from "../Util/bnb";
 import { UsdtItem } from "../Util/usdt";
-
 import { Coppy } from "../Util/coppy";
 import { Download } from "../Util/download";
+
+import { ETH_PRIVATE_ABI } from "../../abis/ETHPrivate";
+import { ETH_PRIVATE_ADDRESS } from "../../constants/index";
+import { getDepositParams } from "../../hooks/private-zkHook";
+
+import { useContractByAddress } from "../../hooks/use-contract";
+import {
+  useEthers,
+  BSCTestnet,
+  useCall,
+  useContractFunction,
+} from "@usedapp/core";
 
 interface DepositPopupProps {
   setDepositPopup?: (value: boolean) => void;
@@ -15,9 +28,90 @@ interface DepositPopupProps {
   amount4?: number | string;
   total?: number | string;
   gasPrice?: number;
+  nullifier?: string;
 }
 
+const combineData = (amounts, nullifier) => {
+  // Combine amounts and nullifier into a single string or JSON structure
+  const combinedData = {
+    amount1: amounts.amount1,
+    amount2: amounts.amount2,
+    amount3: amounts.amount3,
+    amount4: amounts.amount4,
+    nullifier: nullifier,
+  };
+
+  // Convert the combined data to a JSON string
+  const jsonString = JSON.stringify(combinedData, null, 2);
+
+  return jsonString;
+};
+
 export const DepositPopup = (props: DepositPopupProps) => {
+  const [isBackedUp, setIsBackedUp] = useState(false);
+  const [ticked, setTicked] = useState(false);
+
+  const ETHPrivateContract = useContractByAddress(
+    ETH_PRIVATE_ADDRESS,
+    ETH_PRIVATE_ABI
+  );
+
+  const DepositFunction = useContractFunction(ETHPrivateContract, "deposit");
+
+  const handleCopy = () => {
+    const combinedData = combineData(props, props.nullifier);
+
+    // Copy the combined data to the clipboard
+    navigator.clipboard.writeText(combinedData);
+
+    // Set state or provide feedback to indicate the copy action
+    setIsBackedUp(true);
+  };
+
+  const handleDownload = () => {
+    const combinedData = combineData(props, props.nullifier);
+
+    const blob = new Blob([combinedData], { type: "application/json" });
+    const downloadLink = document.createElement("a");
+    downloadLink.href = URL.createObjectURL(blob);
+    downloadLink.download = "deposit_data.json";
+
+    document.body.appendChild(downloadLink);
+    downloadLink.click();
+
+    document.body.removeChild(downloadLink);
+    URL.revokeObjectURL(downloadLink.href);
+  };
+
+  const handleDeposit = async () => {
+    if (
+      props.amount1 &&
+      props.amount2 &&
+      props.amount3 &&
+      props.amount4 &&
+      props.nullifier
+    ) {
+      const { error, params } = await getDepositParams(props.nullifier, [
+        BigInt(ethers.utils.parseUnits(String(props.amount1), "ether")._hex),
+        BigInt(ethers.utils.parseUnits(String(props.amount2), "ether")._hex),
+        BigInt(ethers.utils.parseUnits(String(props.amount3), "ether")._hex),
+        BigInt(ethers.utils.parseUnits(String(props.amount4), "ether")._hex),
+      ]);
+
+      if (error) {
+        console.log("Error: ", error);
+      } else {
+        const depositTX = await DepositFunction.send(params, {
+          value: ethers.utils.parseUnits(String(props.total), "ether"),
+        });
+
+        if (depositTX) {
+          props.setDepositPopup(false);
+        }
+      }
+    }
+  };
+
   return (
     <div className="fixed inset-0 flex items-center justify-center">
       <div
@@ -31,7 +125,7 @@ export const DepositPopup = (props: DepositPopupProps) => {
       <div className="md:w-[45%] w-[95%] h-[650px] text-white rounded-xl select-token-popup transform  translate-y-[6%]">
         <div className="mx-[10%]">
           <div className="flex flex-row justify-between my-6">
-            <div className="text-2xl">Your private note</div>
+            <div className="text-2xl mt-8">Your private note</div>
             <div
               className="my-auto cursor-pointer text-2xl  w-6 h-6 rounded-full flex items-center justify-center"
               onClick={() => props.setDepositPopup(false)}
@@ -39,10 +133,9 @@ export const DepositPopup = (props: DepositPopupProps) => {
               &times;
             </div>
           </div>
-          <div className="text-left text-sm">
+          <div className="text-left text-sm mt-8">
             Please backup your note. You will need it later to withdraw your
-            deposit back.Treat your note as a private key never share it with
-            anyone, including mixerswap developers.
+            deposit back.
           </div>
           <div
             className="text-left flex flex-col gap-4 p-4 rounded-xl text-sm break-words mt-8"
@@ -50,9 +143,7 @@ export const DepositPopup = (props: DepositPopupProps) => {
               background: "rgb(24,38,48)",
             }}
           >
-            <div className="text-[#01E37C]">
-              mixerswap-0.1-5-0x47ab6a268417747197366027886Ød9d88d62aa743ddc0f2972dd51ca9fe22eda7a962e6e0238597343146fe525cfb664eccb80e13f8b619119810499f15
-            </div>
+            <div className="text-[#01E37C]">{props.nullifier}</div>
             <div className="flex flex-row justify-between">
               <div className="flex gap-4">
                 <div className=" my-auto">Private array</div>
@@ -93,10 +184,10 @@ export const DepositPopup = (props: DepositPopupProps) => {
                 </div>
               </div>
               <div className=" flex flex-row gap-4 my-auto">
-                <div>
+                <div onClick={handleCopy}>
                   <Coppy />
                 </div>
-                <div>
+                <div onClick={handleDownload}>
                   <Download />
                 </div>
               </div>
@@ -142,6 +233,7 @@ export const DepositPopup = (props: DepositPopupProps) => {
                   type="checkbox"
                   className="form-checkbox rounded-xl"
                   id="checkbox"
+                  onChange={() => setTicked(!ticked)}
                   style={{
                     accentColor: "#01E37C",
                   }}
@@ -151,15 +243,29 @@ export const DepositPopup = (props: DepositPopupProps) => {
             </div>
           </div>
 
-          <div
-            className={[
-              " cursor-pointer text-center items-center w-full px-3 py-3 justify-center mt-8",
-              "deposit-button text-black hover:text-white",
-            ].join(" ")}
-            onClick={() => {}}
-          >
-            Send Deposit
-          </div>
+          {ticked ? (
+            <div
+              className={[
+                " cursor-pointer text-center items-center w-full px-3 py-3 justify-center mt-8",
+                "deposit-button text-black hover:text-white",
+              ].join(" ")}
+              onClick={handleDeposit}
+            >
+              Send Deposit
+            </div>
+          ) : (
+            <button
+              className={[
+                " cursor-pointer text-center  items-center w-full px-3 py-3 justify-center mt-8 disabled: rounded-xl",
+              ].join(" ")}
+              style={{
+                background: "gray",
+              }}
+              disabled
+            >
+              Send Deposit
+            </button>
+          )}
         </div>
       </div>
     </div>

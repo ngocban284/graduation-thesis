@@ -2,3 +2,11 @@ export const FUZZY_COMMITMENT_ADDRESS =
   "0x2FF2eB06B51594A0B731805e70cfd09c1A88469c";
 
 export const V_TOTAL = 0.4;
+
+export const BSC_TESTNET_RPC =
+  "https://data-seed-prebsc-1-s2.bnbchain.org:8545";
+
+export const DKG_CONTRACT_ADDRESS =
+  "0x9cD832530AaFE09D28C6A224F28bE88211376c26";
+
+export const ETH_PRIVATE_ADDRESS = "0x75AAd1fA4d8C8479B65311D14B2e2D025E53387F";

@@ -15,9 +15,14 @@ import { UsdtItem } from "../Util/usdt";
 import { SelectTokenPopup } from "../Popup/SelectTokenPopup";
 import { Introduction } from "./Introduction";
 import { DepositPopup } from "../Popup/DepositPopup";
-import { DKGHelper } from "private-zk-sdk";
 
-import { V_TOTAL } from "../../constants/index";
+import {
+  V_TOTAL,
+  BSC_TESTNET_RPC,
+  DKG_CONTRACT_ADDRESS,
+} from "../../constants/index";
+
+import { useGetNullifier } from "../../hooks/private-zkHook";
 
 export const Deposit = () => {
   const { switchNetwork, chainId, account, deactivate, activateBrowserWallet } =
@@ -56,6 +61,7 @@ export const Deposit = () => {
   const [amount3, setAmount3] = useState("");
   const [amount4, setAmount4] = useState("");
   const [vPrivate, setVPrivate] = useState([]);
+  const [nullifier, setNullifier] = useState(BigInt(0));
   const [total, setTotal] = useState("");
   const [gasPrice, setGasPrice] = useState(2);
 
@@ -63,8 +69,14 @@ export const Deposit = () => {
     setGasPrice(parseInt(e.target.value, 10));
   };
 
-  const handleDepositClick = () => {
+  const handleDepositClick = async () => {
     setDepositPopup(true);
+
+    const { errorRN, randomNullifier } = await useGetNullifier();
+
+    if (!errorRN) {
+      setNullifier(randomNullifier);
+    }
   };
 
   const handleNetwork = (network: string) => {
@@ -159,6 +171,7 @@ export const Deposit = () => {
           amount4={amount4}
           total={total}
           gasPrice={gasPrice}
+          nullifier={String(nullifier)}
         />
       )}
 
@@ -317,7 +330,7 @@ export const Deposit = () => {
               "  cursor-pointer text-center items-center justify-center px-3 py-3 mx-6 mt-4",
               "deposit-button text-black hover:text-white",
             ].join(" ")}
-            onClick={() => setDepositPopup(true)}
+            onClick={() => handleDepositClick()}
           >
             Deposit
           </div>
