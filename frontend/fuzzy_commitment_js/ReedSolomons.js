@@ -382,6 +382,7 @@ ReedSolomonEncoder.prototype = {
     if (dataBytes <= 0) {
       throw new Error('IllegalArgumentException("No data bytes provided")');
     }
+    // create the polynomial G(x)
     var generator = this.buildGenerator(ecBytes);
     var infoCoefficients = new Int32Array(dataBytes);
     infoCoefficients.set(toEncode.subarray(0, dataBytes));

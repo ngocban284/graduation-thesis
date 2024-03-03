@@ -1,4 +1,4 @@
-import { ethers } from "ethers";
+import { BigNumber, ethers } from "ethers";
 import { useMemo, useEffect, useState } from "react";
 
 import {
@@ -15,6 +15,8 @@ import { UsdtItem } from "../Util/usdt";
 import { SelectTokenPopup } from "../Popup/SelectTokenPopup";
 import { Introduction } from "./Introduction";
 import { DepositPopup } from "../Popup/DepositPopup";
+
+import { V_TOTAL } from "../../constants/index";
 
 export const Deposit = () => {
   const { switchNetwork, chainId, account, deactivate, activateBrowserWallet } =
@@ -48,11 +50,12 @@ export const Deposit = () => {
   const [despositPopup, setDepositPopup] = useState(false);
   const [selectedToken, setSelectedToken] = useState("");
   const [amount, setAmount] = useState(0);
-  const [amount1, setAmount1] = useState(0);
-  const [amount2, setAmount2] = useState(0);
-  const [amount3, setAmount3] = useState(0);
-  const [amount4, setAmount4] = useState(0);
-  const [total, setTotal] = useState(0);
+  const [amount1, setAmount1] = useState("");
+  const [amount2, setAmount2] = useState("");
+  const [amount3, setAmount3] = useState("");
+  const [amount4, setAmount4] = useState("");
+  const [vPrivate, setVPrivate] = useState([]);
+  const [total, setTotal] = useState("");
   const [gasPrice, setGasPrice] = useState(2);
 
   const handleGasChange = (e) => {
@@ -87,30 +90,47 @@ export const Deposit = () => {
   };
 
   const handleAmount1 = (e) => {
-    setAmount1(Number(e.target.value));
+    setAmount1(e.target.value);
   };
+
   const handleAmount2 = (e) => {
-    setAmount2(Number(e.target.value));
+    setAmount2(e.target.value);
   };
+
   const handleAmount3 = (e) => {
-    setAmount3(Number(e.target.value));
+    setAmount3(e.target.value);
   };
+
   const handleAmount4 = (e) => {
-    setAmount4(Number(e.target.value));
+    setAmount4(e.target.value);
   };
 
   useEffect(() => {
-    if (
-      typeof amount1 === "number" &&
-      typeof amount2 === "number" &&
-      typeof amount3 === "number" &&
-      typeof amount4 === "number"
-    ) {
-      setTotal(amount1 + amount2 + amount3 + amount4);
+    if (amount1 !== "" && amount2 !== "" && amount3 !== "" && amount4 !== "") {
+      const total =
+        parseFloat(amount1) +
+        parseFloat(amount2) +
+        parseFloat(amount3) +
+        parseFloat(amount4);
+
+      if (total == V_TOTAL) {
+        setTotal(String(total));
+
+        setVPrivate([
+          BigInt(parseFloat(amount1) * 10 ** 18),
+          BigInt(parseFloat(amount2) * 10 ** 18),
+          BigInt(parseFloat(amount3) * 10 ** 18),
+          BigInt(parseFloat(amount4) * 10 ** 18),
+        ]);
+        console.log("vPrivate", vPrivate);
+      } else {
+        setTotal("0");
+      }
     } else {
-      setTotal(0);
+      setTotal("0");
     }
   }, [amount1, amount2, amount3, amount4]);
+  console.log("total", total);
 
   return (
     <>
@@ -207,8 +227,7 @@ export const Deposit = () => {
               <input
                 className="md:w-1/6 w-1/4 bg-transparent  rounded-xl py-4 text-center"
                 placeholder="0"
-                type="number"
-                value={amount1 == 0 ? "" : amount1}
+                value={amount1}
                 onChange={(e) => handleAmount1(e)}
                 style={{
                   background: "#142631",
@@ -217,8 +236,7 @@ export const Deposit = () => {
               <input
                 className="md:w-1/6 w-1/4  bg-transparent  rounded-xl py-4 text-center"
                 placeholder="0"
-                type="number"
-                value={amount2 == 0 ? "" : amount2}
+                value={amount2}
                 onChange={(e) => handleAmount2(e)}
                 style={{
                   background: "#142631",
@@ -228,7 +246,7 @@ export const Deposit = () => {
                 className="md:w-1/6 w-1/4  bg-transparent  rounded-xl py-4 text-center"
                 placeholder="0"
                 type="number"
-                value={amount3 == 0 ? "" : amount3}
+                value={amount3}
                 onChange={(e) => handleAmount3(e)}
                 style={{
                   background: "#142631",
@@ -237,8 +255,7 @@ export const Deposit = () => {
               <input
                 className="md:w-1/6 w-1/4  bg-transparent  rounded-xl py-4 text-center"
                 placeholder="0"
-                type="number"
-                value={amount4 == 0 ? "" : amount4}
+                value={amount4}
                 onChange={(e) => handleAmount4(e)}
                 style={{
                   background: "#142631",
@@ -290,7 +307,7 @@ export const Deposit = () => {
             />
           </div>
 
-          {/* <div
+          <div
             className={[
               "  cursor-pointer text-center items-center justify-center px-3 py-3 mx-6 mt-4",
               "deposit-button text-black hover:text-white",
@@ -298,8 +315,8 @@ export const Deposit = () => {
             onClick={() => setDepositPopup(true)}
           >
             Deposit
-          </div> */}
-          <div className="group justify-center text-center flex w-full">
+          </div>
+          {/* <div className="group justify-center text-center flex w-full">
             <div
               className={[
                 " text-center items-center mx-6  px-3 py-3 justify-center w-full ",
@@ -318,7 +335,7 @@ export const Deposit = () => {
             >
               Coming Soon
             </div>
-          </div>
+          </div> */}
         </div>
       </div>
     </>

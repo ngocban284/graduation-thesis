@@ -9,11 +9,11 @@ interface DepositPopupProps {
   setDepositPopup?: (value: boolean) => void;
   selectedToken?: string;
   setGasPrice?: (value: number) => void;
-  amount1?: number;
-  amount2?: number;
-  amount3?: number;
-  amount4?: number;
-  total?: number;
+  amount1?: number | string;
+  amount2?: number | string;
+  amount3?: number | string;
+  amount4?: number | string;
+  total?: number | string;
   gasPrice?: number;
 }
 

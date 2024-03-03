@@ -7,7 +7,7 @@ export const X_URL = "";
 export const MEDIUM_URL = "";
 
 export const C_URL = "";
-export const C_TITLE = "SafeChest";
+export const C_TITLE = "PrivateZK";
 export const C_DESCRIPTION = "";
 export const C_SEO_DESCRIPTION = C_DESCRIPTION;
 

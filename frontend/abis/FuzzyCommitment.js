@@ -49,7 +49,13 @@ export const FuzzyCommitmentAbi = [
     type: "event",
   },
   {
-    inputs: [],
+    inputs: [
+      {
+        internalType: "address",
+        name: "_wallet",
+        type: "address",
+      },
+    ],
     name: "getCommitment",
     outputs: [
       {
@@ -62,7 +68,13 @@ export const FuzzyCommitmentAbi = [
     type: "function",
   },
   {
-    inputs: [],
+    inputs: [
+      {
+        internalType: "address",
+        name: "_wallet",
+        type: "address",
+      },
+    ],
     name: "getFeatureVectorHash",
     outputs: [
       {
@@ -75,7 +87,13 @@ export const FuzzyCommitmentAbi = [
     type: "function",
   },
   {
-    inputs: [],
+    inputs: [
+      {
+        internalType: "address",
+        name: "_wallet",
+        type: "address",
+      },
+    ],
     name: "getHashOfPersonalInfoHash",
     outputs: [
       {
@@ -95,6 +113,25 @@ export const FuzzyCommitmentAbi = [
         internalType: "address",
         name: "",
         type: "address",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "_nullifierHash",
+        type: "uint256",
+      },
+    ],
+    name: "getUsedNullifierHash",
+    outputs: [
+      {
+        internalType: "bool",
+        name: "",
+        type: "bool",
       },
     ],
     stateMutability: "view",
@@ -134,6 +171,11 @@ export const FuzzyCommitmentAbi = [
         internalType: "uint256[3]",
         name: "_input",
         type: "uint256[3]",
+      },
+      {
+        internalType: "address",
+        name: "_wallet",
+        type: "address",
       },
     ],
     name: "recoverWallet",

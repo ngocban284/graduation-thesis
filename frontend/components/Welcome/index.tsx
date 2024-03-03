@@ -41,9 +41,9 @@ export const Welcome: FC<WelcomeProps> = () => {
   }, [chainId]);
 
   const [visibility, setVisibility] = useState({
-    deposit: false,
+    deposit: true,
     withdraw: false,
-    registry: true,
+    registry: false,
     recovery: false,
     info: false,
   });

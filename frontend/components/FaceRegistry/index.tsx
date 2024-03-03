@@ -115,6 +115,8 @@ export const FaceRegistry: FC<FaceProps> = () => {
           detections[0].descriptor
         );
 
+        console.log("face vector", detections[0].descriptor);
+
         // console.log("commitment", commitment);
         // console.log("featureVectorHash", featureVectorHash);
 
@@ -243,19 +245,9 @@ export const FaceRegistry: FC<FaceProps> = () => {
               <div
                 className={[
                   "  cursor-pointer text-center items-center justify-center w-full px-3 py-3",
-                  "capture-button text-black hover:text-white ",
-                ].join(" ")}
-                onClick={() => handleRegistry()}
-              >
-                Capture
-              </div>
-
-              <div
-                className={[
-                  "  cursor-pointer text-center items-center justify-center w-full px-3 py-3",
                   "deposit-button text-black hover:text-white ",
                 ].join(" ")}
-                // onClick={() => handleRegistry()}
+                onClick={() => handleRegistry()}
               >
                 Registry
               </div>
