@@ -2,10 +2,11 @@ import { ethers } from "ethers";
 import { useMemo, useEffect, useState } from "react";
 
 import {
-  shortenIfAddress,
-  useEtherBalance,
   useEthers,
+  useEtherBalance,
   BSCTestnet,
+  useCall,
+  useContractFunction,
 } from "@usedapp/core";
 
 import {
@@ -13,6 +14,15 @@ import {
   BSC_TESTNET_RPC,
   DKG_CONTRACT_ADDRESS,
 } from "../../constants/index";
+
+import { ETH_PRIVATE_ABI } from "../../abis/ETHPrivate";
+import { ETH_PRIVATE_ADDRESS } from "../../constants/index";
+import {
+  getDepositParams,
+  useGenerateWithdrawParams,
+} from "../../hooks/private-zkHook";
+
+import { useContractByAddress } from "../../hooks/use-contract";
 
 import { EthItem } from "../Util/eth";
 import { BnbItem } from "../Util/bnb";
@@ -31,6 +41,13 @@ export const Withdraw = () => {
     }
   }, [chainId]);
   const balanceHex = useEtherBalance(account);
+
+  const ETHPrivateContract = useContractByAddress(
+    ETH_PRIVATE_ADDRESS,
+    ETH_PRIVATE_ABI
+  );
+
+  const WithdrawFunction = useContractFunction(ETHPrivateContract, "withdraw");
 
   const [amount, setAmount] = useState("");
   const [amount1, setAmount1] = useState("");
@@ -154,6 +171,26 @@ export const Withdraw = () => {
     console.log("indexInPrivateV", indexInPrivateV);
   };
 
+  const handleWithdraw = async () => {
+    if (indexInPrivateV && nullifier && receipt) {
+      const withdrawParams = await useGenerateWithdrawParams(
+        BigInt(nullifier),
+        receipt,
+        receipt,
+        [
+          BigInt(parseFloat(amount1) * 10 ** 18),
+          BigInt(parseFloat(amount2) * 10 ** 18),
+          BigInt(parseFloat(amount3) * 10 ** 18),
+          BigInt(parseFloat(amount4) * 10 ** 18),
+        ],
+        BigInt(indexInPrivateV),
+        BigInt(0)
+      );
+
+      console.log("withdrawParams", withdrawParams);
+    }
+  };
+
   useEffect(() => {
     if (amount1 !== "" && amount2 !== "" && amount3 !== "" && amount4 !== "") {
       const total =
@@ -165,11 +202,18 @@ export const Withdraw = () => {
       if (total == V_TOTAL) {
         setTotal(String(total));
 
+        // setVPrivate([
+        //   BigInt(parseFloat(amount1) * 10 ** 18),
+        //   BigInt(parseFloat(amount2) * 10 ** 18),
+        //   BigInt(parseFloat(amount3) * 10 ** 18),
+        //   BigInt(parseFloat(amount4) * 10 ** 18),
+        // ]);
+
         setVPrivate([
-          BigInt(parseFloat(amount1) * 10 ** 18),
-          BigInt(parseFloat(amount2) * 10 ** 18),
-          BigInt(parseFloat(amount3) * 10 ** 18),
-          BigInt(parseFloat(amount4) * 10 ** 18),
+          parseFloat(amount1),
+          parseFloat(amount2),
+          parseFloat(amount3),
+          parseFloat(amount4),
         ]);
 
         console.log("vPrivate", vPrivate);
@@ -367,14 +411,7 @@ export const Withdraw = () => {
                   {indexInPrivateV ? (
                     <div>
                       {vPrivate[indexInPrivateV] != undefined
-                        ? String(
-                            ethers.utils.formatUnits(
-                              vPrivate[indexInPrivateV]
-                                ? vPrivate[indexInPrivateV]
-                                : "",
-                              18
-                            )
-                          )
+                        ? String(vPrivate[indexInPrivateV])
                         : "0.00"}
                     </div>
                   ) : (
@@ -398,7 +435,7 @@ export const Withdraw = () => {
                     " cursor-pointer text-center items-center  px-3 py-3 justify-center ",
                     "deposit-button text-black hover:text-white",
                   ].join(" ")}
-                  onClick={() => {}}
+                  onClick={handleWithdraw}
                 >
                   Withdraw
                 </div>
