@@ -19,7 +19,11 @@
     "next-env.d.ts",
     "**/*.ts",
     "**/*.tsx",
-    "./fuzzy_commitment_js/*.js"
+    "./fuzzy_commitment_js/*.js",
+    "./SDK/*.ts",
+    "./hooks/zk-resource/**/*.wasm",
+    "./hooks/zk-resource/**/*.zkey",
+    "public/worker.js"
   ],
   "exclude": ["node_modules"]
 }

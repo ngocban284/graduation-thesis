@@ -1,6 +1,9 @@
 import { PrivateZKHelper } from "../SDK/src/adapter/privateZK";
 import { BSC_TESTNET_RPC, DKG_CONTRACT_ADDRESS } from "../constants";
+const snarkjs = require("snarkjs");
 
+import * as fs from "fs";
+import path from "path";
 const zkHelper = new PrivateZKHelper(BSC_TESTNET_RPC, DKG_CONTRACT_ADDRESS);
 
 export const useGetNullifier = () => {
@@ -28,3 +31,19 @@ export const useGenerateWithdrawParams = async (
     feePercent
   );
 };
+
+export const useProveWithdrawProof = async (inputs) => {
+  const { proof, publicSignals } = await window.snarkjs.groth16.fullProve(
+    inputs,
+    "/zk-resource/withdraw/Withdraw.wasm",
+    "/zk-resource/withdraw/Withdraw.zkey"
+  );
+  return { proof, publicSignals };
+};
+
+export const useProveWithdrawProofcc = async (inputs) => {
+  //  get path of zk resource use path
+  console.log(path.join(__dirname, "../zk-resource/withdraw/Withdraw.wasm"));
+};
+
+// get link zk resource . ../zk-resource/withdraw/Withdraw.wasm

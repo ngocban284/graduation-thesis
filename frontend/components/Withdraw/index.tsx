@@ -20,6 +20,8 @@ import { ETH_PRIVATE_ADDRESS } from "../../constants/index";
 import {
   getDepositParams,
   useGenerateWithdrawParams,
+  useProveWithdrawProofcc,
+  useProveWithdrawProof,
 } from "../../hooks/private-zkHook";
 
 import { useContractByAddress } from "../../hooks/use-contract";
@@ -173,7 +175,7 @@ export const Withdraw = () => {
 
   const handleWithdraw = async () => {
     if (indexInPrivateV && nullifier && receipt) {
-      const withdrawParams = await useGenerateWithdrawParams(
+      const { error, circuitInput } = await useGenerateWithdrawParams(
         BigInt(nullifier),
         receipt,
         receipt,
@@ -187,7 +189,17 @@ export const Withdraw = () => {
         BigInt(0)
       );
 
-      console.log("withdrawParams", withdrawParams);
+      if (error) {
+        console.log("error", error);
+      } else {
+        // const {
+        //   proof: commitee3WithdrawProofs,
+        //   publicSignals: commitee3WithdrawPublicSignals,
+        // } = await useProveWithdrawProof(circuitInput);
+        // // await useProveWithdrawProofcc(circuitInput);
+
+        const worker = new Worker("./worker.js");
+      }
     }
   };
 

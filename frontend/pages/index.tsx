@@ -34,6 +34,7 @@ export default function Home(): JSX.Element {
           rel="stylesheet"
           href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.5.2/animate.min.css"
         />
+        <script type="application/javascript" src="/snarkjs.min.js"></script>
       </Head>
 
       <Script

@@ -2,7 +2,7 @@ const { ethers, upgrades } = require("hardhat");
 const Mixer = require("mixerswap-helper-sdk");
 const { abi } = require("./ETHMixer.json");
 const snarkjs = require("snarkjs");
-const ETHMixerA = "0x18A0df5c96B2Df788dB3083f4cF75aa9A3a9cf45";
+const ETHMixerA = "0xe9F98D6B186cAa76555350d959b86eDf67b5af75";
 
 async function proveWithdraw(inputs) {
   const { proof, publicSignals } = await snarkjs.groth16.fullProve(
@@ -83,8 +83,7 @@ async function main() {
 
   // console.log("commitee3WithdrawProofByte", commitee3WithdrawProofByte);
   // console.log("publicSignals", commitee3WithdrawPublicSignals);
-  console.log("withdrawParams", withdrawParams);
-  const withdrawTx = await ETHMixerContract.connect(commitee3).withdraw([
+  console.log("withdrawParams", [
     commitee3WithdrawProofByte,
     commitee3WithdrawPublicSignals[0],
     commitee3WithdrawPublicSignals[1],
@@ -94,6 +93,16 @@ async function main() {
     commitee3.address,
     commitee3WithdrawPublicSignals[8],
   ]);
+  // const withdrawTx = await ETHMixerContract.connect(commitee3).withdraw([
+  //   commitee3WithdrawProofByte,
+  //   commitee3WithdrawPublicSignals[0],
+  //   commitee3WithdrawPublicSignals[1],
+  //   commitee3WithdrawPublicSignals[2],
+  //   commitee3WithdrawPublicSignals[3],
+  //   commitee3.address,
+  //   commitee3.address,
+  //   commitee3WithdrawPublicSignals[8],
+  // ]);
 
   // console.log("withdrawTx", withdrawTx);
 
