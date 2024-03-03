@@ -15,6 +15,7 @@ import { UsdtItem } from "../Util/usdt";
 import { SelectTokenPopup } from "../Popup/SelectTokenPopup";
 import { Introduction } from "./Introduction";
 import { DepositPopup } from "../Popup/DepositPopup";
+import { DKGHelper } from "private-zk-sdk";
 
 import { V_TOTAL } from "../../constants/index";
 
@@ -60,6 +61,10 @@ export const Deposit = () => {
 
   const handleGasChange = (e) => {
     setGasPrice(parseInt(e.target.value, 10));
+  };
+
+  const handleDepositClick = () => {
+    setDepositPopup(true);
   };
 
   const handleNetwork = (network: string) => {
@@ -316,26 +321,6 @@ export const Deposit = () => {
           >
             Deposit
           </div>
-          {/* <div className="group justify-center text-center flex w-full">
-            <div
-              className={[
-                " text-center items-center mx-6  px-3 py-3 justify-center w-full ",
-                "deposit-disabled-button cursor-not-allowed text-[#637592]",
-              ].join(" ")}
-              onClick={() => {}}
-            >
-              Deposit
-            </div>
-            <div
-              className="whitespace-nowrap text-sm absolute hidden group-hover:flex  p-2 mt-14 text-black rounded-lg "
-              // className="text-center absolute justify-center"
-              style={{
-                background: "#01d096",
-              }}
-            >
-              Coming Soon
-            </div>
-          </div> */}
         </div>
       </div>
     </>
