@@ -20,8 +20,9 @@ import { ETH_PRIVATE_ADDRESS } from "../../constants/index";
 import {
   getDepositParams,
   useGenerateWithdrawParams,
-  useProveWithdrawProofcc,
   useProveWithdrawProof,
+  useGenerateWithdrawParamsHuhu,
+  toAddress,
 } from "../../hooks/private-zkHook";
 
 import { useContractByAddress } from "../../hooks/use-contract";
@@ -197,8 +198,59 @@ export const Withdraw = () => {
         //   publicSignals: commitee3WithdrawPublicSignals,
         // } = await useProveWithdrawProof(circuitInput);
         // // await useProveWithdrawProofcc(circuitInput);
-
+        // useGenerateWithdrawParamsHehe
         const worker = new Worker("./worker.js");
+
+        worker.postMessage(["fullProve", circuitInput]);
+
+        worker.onmessage = async function (e) {
+          if (e.data == "Error: Couldn't prove the circuit") {
+            console.log("Error: Couldn't prove the circuit");
+            return;
+          }
+          const { proof, publicSignals } = e.data;
+
+          // encode
+          const encoder = await ethers.utils.defaultAbiCoder;
+
+          const encodedProof = encoder.encode(
+            ["uint256[8]"],
+            [
+              [
+                BigInt(proof.pi_a[0]),
+                BigInt(proof.pi_a[1]),
+                BigInt(proof.pi_b[0][1]),
+                BigInt(proof.pi_b[0][0]),
+                BigInt(proof.pi_b[1][1]),
+                BigInt(proof.pi_b[1][0]),
+                BigInt(proof.pi_c[0]),
+                BigInt(proof.pi_c[1]),
+              ],
+            ]
+          );
+
+          console.log("Public Signals", publicSignals);
+          console.log("Proof successfully generated", proof);
+
+          const callWithdrawParams = [
+            encodedProof,
+            publicSignals[0],
+            publicSignals[1],
+            publicSignals[2],
+            publicSignals[3],
+            await toAddress(publicSignals[6]),
+            await toAddress(publicSignals[7]),
+            publicSignals[8],
+          ];
+
+          const withdrawTx = await WithdrawFunction.send(callWithdrawParams);
+
+          if (withdrawTx.status == 1) {
+            console.log("Withdraw success");
+          } else {
+            console.log("Withdraw failed");
+          }
+        };
       }
     }
   };
