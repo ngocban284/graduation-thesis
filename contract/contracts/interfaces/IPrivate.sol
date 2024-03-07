@@ -31,6 +31,9 @@ interface IPrivateZK {
         address payable recipient;
         address payable relayer;
         uint256 fee;
+        uint256 faceVectorHash;
+        bytes reedSolomonProof;
+        uint256[] publicSignals; 
     }
     // uint256 _refund
 }

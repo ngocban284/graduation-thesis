@@ -10,13 +10,14 @@ contract Verifier is IVerifier, Opcode {
     mapping(uint8 => address) public verifiers;
     mapping(uint8 => uint8) internal inputsLength;
 
-    constructor(address[3] memory _verifiers) {
+    constructor(address[4] memory _verifiers) {
         for (uint8 i = 0; i < 3; i++) {
             verifiers[i + 1] = _verifiers[i];
         }
         inputsLength[OPCODE_ROUND2] = 22;
         inputsLength[OPCODE_REVEAL] = 23;
         inputsLength[OPCODE_WITHDRAW] = 9;
+        inputsLength[OPCODE_RECOVERY] = 3;
     }
 
     function publicInputsLength(uint8 _opcode) public override  view returns (uint8) {
@@ -45,6 +46,9 @@ contract Verifier is IVerifier, Opcode {
         if (_opcode == 3) {
             return IGroth16Verifier(verifiers[3]).verifyProof(_a, _b, _c, publicInputsWithdraw(_publicInputs));
         }
+        if (_opcode == 4) {
+             return IGroth16Verifier(verifiers[4]).verifyProof(_a, _b, _c, publicInputsWithdraw(_publicInputs));
+        }
         // return true;
     }
 
@@ -69,6 +73,15 @@ contract Verifier is IVerifier, Opcode {
     function publicInputsWithdraw(uint256[] calldata _publicInputs) internal pure returns (uint256[9] memory) {
         require(_publicInputs.length == 9);
         uint256[9] memory publicInputs;
+        for (uint256 i = 0; i < _publicInputs.length; i++) {
+            publicInputs[i] = _publicInputs[i];
+        }
+        return publicInputs;
+    }
+
+    function publicInputsRecovery(uint256[] calldata _publicInputs) internal pure returns (uint256[3] memory) {
+        require(_publicInputs.length == 3);
+        uint256[3] memory publicInputs;
         for (uint256 i = 0; i < _publicInputs.length; i++) {
             publicInputs[i] = _publicInputs[i];
         }

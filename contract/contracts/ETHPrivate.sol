@@ -3,11 +3,11 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import {PrivateZK} from "./Private.sol";
+import {AggregateZK} from "./AggregateZK.sol";
 import {FuzzyCommitment} from "./FuzzyCommitment.sol";
 
-contract ETHMixer is PrivateZK  {
-    constructor(PrivateConfig memory config) PrivateZK(config) {}
+contract ETHMixer is AggregateZK  {
+    constructor(PrivateConfig memory config) AggregateZK(config) {}
 
     function _beforeDeposit(DepositParams calldata depositParams) internal override {
         require(msg.value == depositParams.amount, "Please send `amount` ETH along with transaction");

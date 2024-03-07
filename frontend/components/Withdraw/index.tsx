@@ -193,15 +193,9 @@ export const Withdraw = () => {
       if (error) {
         console.log("error", error);
       } else {
-        // const {
-        //   proof: commitee3WithdrawProofs,
-        //   publicSignals: commitee3WithdrawPublicSignals,
-        // } = await useProveWithdrawProof(circuitInput);
-        // // await useProveWithdrawProofcc(circuitInput);
-        // useGenerateWithdrawParamsHehe
         const worker = new Worker("./worker.js");
 
-        worker.postMessage(["fullProve", circuitInput]);
+        worker.postMessage(["fullProveWithdraw", circuitInput]);
 
         worker.onmessage = async function (e) {
           if (e.data == "Error: Couldn't prove the circuit") {
@@ -228,9 +222,6 @@ export const Withdraw = () => {
               ],
             ]
           );
-
-          console.log("Public Signals", publicSignals);
-          console.log("Proof successfully generated", proof);
 
           const callWithdrawParams = [
             encodedProof,
@@ -265,13 +256,6 @@ export const Withdraw = () => {
 
       if (total == V_TOTAL) {
         setTotal(String(total));
-
-        // setVPrivate([
-        //   BigInt(parseFloat(amount1) * 10 ** 18),
-        //   BigInt(parseFloat(amount2) * 10 ** 18),
-        //   BigInt(parseFloat(amount3) * 10 ** 18),
-        //   BigInt(parseFloat(amount4) * 10 ** 18),
-        // ]);
 
         setVPrivate([
           parseFloat(amount1),
