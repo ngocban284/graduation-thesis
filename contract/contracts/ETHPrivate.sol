@@ -4,8 +4,9 @@
 pragma solidity ^0.8.0;
 
 import {PrivateZK} from "./Private.sol";
+import {FuzzyCommitment} from "./FuzzyCommitment.sol";
 
-contract ETHMixer is PrivateZK {
+contract ETHMixer is PrivateZK  {
     constructor(PrivateConfig memory config) PrivateZK(config) {}
 
     function _beforeDeposit(DepositParams calldata depositParams) internal override {
