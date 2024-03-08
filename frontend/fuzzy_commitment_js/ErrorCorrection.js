@@ -71,11 +71,11 @@ class ReedSolomonEC {
     feat_vec_prime = feat_vec_prime.map((value) =>
       helper.binaryQuantize(value)
     );
-    console.log(`Quantized Descriptor for face:`, feat_vec_prime);
+    // console.log(`Quantized Descriptor for face:`, feat_vec_prime);
     var packet_prime = helper.xor(feat_vec_prime, c);
-    console.log("Attempting to recover packet", packet_prime);
+    // console.log("Attempting to recover packet", packet_prime);
     var err_packet = new Uint8Array(packet_prime);
-    console.log("Packet before decoding", err_packet);
+    // console.log("Packet before decoding", err_packet);
     try {
       this.ec.decode(packet_prime);
     } catch (error) {

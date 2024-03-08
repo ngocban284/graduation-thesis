@@ -14,10 +14,11 @@ import ReedSolomonEC from "../../fuzzy_commitment_js/ErrorCorrection";
 import {
   sha256HasherToBigInt,
   poseidonHash,
+  generateRandom128Bit,
 } from "../../fuzzy_commitment_js/Helpers";
 
-import { FuzzyCommitmentAbi } from "../../abis/FuzzyCommitment";
-import { FUZZY_COMMITMENT_ADDRESS } from "../../constants/index";
+import { ETH_PRIVATE_ABI } from "../../abis/ETHPrivate";
+import { ETH_PRIVATE_ADDRESS } from "../../constants/index";
 
 import { useContractByAddress } from "../../hooks/use-contract";
 import {
@@ -49,15 +50,15 @@ export const FaceRecovery: FC<FaceProps> = () => {
     answer: "",
   });
 
-  const fuzzyCommitmentContract = useContractByAddress(
-    FUZZY_COMMITMENT_ADDRESS,
-    FuzzyCommitmentAbi
+  const ETHPrivateContract = useContractByAddress(
+    ETH_PRIVATE_ADDRESS,
+    ETH_PRIVATE_ABI
   );
 
   const getCommitmentOfWallet = useCall(
     sourceWallet && {
-      contract: fuzzyCommitmentContract,
-      method: "getCommitment",
+      contract: ETHPrivateContract,
+      method: "faceCommitments",
       args: [sourceWallet],
     }
   );
@@ -68,14 +69,10 @@ export const FaceRecovery: FC<FaceProps> = () => {
     if (getCommitmentOfWallet.error) return "----------";
 
     let _resCommitment = getCommitmentOfWallet.value[0];
-    //  convert to BigInt
-    let _primeCommitment = [];
+    // change string "123,1,4,5," to array 128
+    let _commitment = _resCommitment.split(",").map((item) => parseInt(item));
 
-    for (let i = 0; i < _resCommitment.length; i++) {
-      _primeCommitment.push(parseInt(_resCommitment[i]._hex, 16));
-    }
-
-    return _primeCommitment;
+    return _commitment;
   }, [getCommitmentOfWallet]);
 
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -113,58 +110,29 @@ export const FaceRecovery: FC<FaceProps> = () => {
   };
 
   const handleRecovery = async () => {
-    if (isVideoReady.current && videoRef.current && isModelLoaded) {
-      console.log("handleRecovery");
-      const options = new faceapi.TinyFaceDetectorOptions();
-      const detections = await faceapi
-        .detectAllFaces(videoRef.current, options)
-        .withFaceLandmarks()
-        .withFaceDescriptors();
+    try {
+      if (isVideoReady.current && videoRef.current && isModelLoaded) {
+        console.log("handleRecovery");
+        const options = new faceapi.TinyFaceDetectorOptions();
+        const detections = await faceapi
+          .detectAllFaces(videoRef.current, options)
+          .withFaceLandmarks()
+          .withFaceDescriptors();
 
-      console.log("detections", detections[0]);
-      // backup detection[0].descriptor json file
+        console.log("detections", detections[0]);
+        // backup detection[0].descriptor json file
 
-      if (
-        detections.length > 0 &&
-        persionalData.question != "" &&
-        persionalData.answer != "" &&
-        sourceWallet != "" &&
-        primeCommitment != "----------" &&
-        newOwner != ""
-      ) {
-        toast.success("Face detected", {
-          position: "top-right",
-          autoClose: 5000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          progress: undefined,
-          theme: "dark",
-        });
+        console.log("primeCommitment", primeCommitment);
 
-        setDetections(detections);
-
-        // start fuzzy commitment process
-        const { commitment, featureVectorHash } = await RS_EC.fuzzyCommitment(
-          detections[0].descriptor
-        );
-
-        // console.log("commitment", commitment);
-        // console.log("featureVectorHash", featureVectorHash);
-
-        // concat persionalData.question and persionalData.answer to one string
-        const persionalDataConcat =
-          persionalData.question + persionalData.answer;
-
-        // convert persionalDataConcat str to BigInt
-        const persionalDataHash = await sha256HasherToBigInt(
-          persionalDataConcat
-        );
-        // console.log("persionalDataHash", persionalDataHash);
-
-        const persionalPoseidonHash = await poseidonHash([persionalDataHash]);
-
-        if (tx.status == 1) {
-          toast.success("Face Recover Success", {
+        if (
+          detections.length > 0 &&
+          persionalData.question != "" &&
+          persionalData.answer != "" &&
+          sourceWallet != "" &&
+          primeCommitment != "----------" &&
+          newOwner != ""
+        ) {
+          toast.success("Face detected", {
             position: "top-right",
             autoClose: 5000,
             hideProgressBar: false,
@@ -172,8 +140,124 @@ export const FaceRecovery: FC<FaceProps> = () => {
             progress: undefined,
             theme: "dark",
           });
+
+          setDetections(detections);
+
+          // start fuzzy commitment process
+          // const { commitment, featureVectorHash } = await RS_EC.fuzzyCommitment(
+          //   detections[0].descriptor
+          // );
+
+          // console.log("commitment", commitment);
+          // console.log("featureVectorHash", featureVectorHash);
+
+          // concat persionalData.question and persionalData.answer to one string
+          const persionalDataConcat =
+            persionalData.question + persionalData.answer;
+
+          // convert persionalDataConcat str to BigInt
+          const persionalDataHash = await sha256HasherToBigInt(
+            persionalDataConcat
+          );
+          // console.log("persionalDataHash", persionalDataHash);
+
+          const persionalPoseidonHash = await poseidonHash([persionalDataHash]);
+
+          const nullifier = await generateRandom128Bit();
+
+          const nullifierHash = await poseidonHash([nullifier]);
+
+          console.log("primeCommitment", primeCommitment);
+          console.log("detect", detections[0].descriptor);
+          // recover use reed solomon
+          const { err_vector, feat_vec_prime, feature_vec_hash } =
+            await RS_EC.recover(detections[0].descriptor, primeCommitment);
+
+          const circuitInputMerge = {
+            feat_vec_prime: feat_vec_prime,
+            err_code: err_vector,
+            hash_feat_vec: feature_vec_hash,
+            nullifier: nullifier,
+            nullifierHash: nullifierHash,
+            personalInfoHash: persionalDataHash,
+            hashOfPersonalInfoHash: persionalPoseidonHash,
+          };
+
+          // console.log("circuitInputMerge", circuitInputMerge);
+
+          const worker = new Worker("./worker.js");
+
+          worker.postMessage(["fullProveRecovery", circuitInputMerge]);
+
+          worker.onmessage = async function (e) {
+            if (e.data == "Error: Couldn't prove the circuit") {
+              console.log("Error: Couldn't prove the circuit");
+              return;
+            }
+            const { proof, publicSignals } = e.data;
+
+            // encode
+            const encoder = await ethers.utils.defaultAbiCoder;
+
+            const encodedProof = encoder.encode(
+              ["uint256[8]"],
+              [
+                [
+                  BigInt(proof.pi_a[0]),
+                  BigInt(proof.pi_a[1]),
+                  BigInt(proof.pi_b[0][1]),
+                  BigInt(proof.pi_b[0][0]),
+                  BigInt(proof.pi_b[1][1]),
+                  BigInt(proof.pi_b[1][0]),
+                  BigInt(proof.pi_c[0]),
+                  BigInt(proof.pi_c[1]),
+                ],
+              ]
+            );
+
+            const callWithdrawParams = [
+              encodedProof,
+              publicSignals[0],
+              publicSignals[1],
+              publicSignals[2],
+              publicSignals[3],
+              await toAddress(publicSignals[6]),
+              await toAddress(publicSignals[7]),
+              publicSignals[8],
+            ];
+
+            const withdrawTx = await WithdrawFunction.send(callWithdrawParams);
+
+            if (withdrawTx.status == 1) {
+              console.log("Withdraw success");
+            } else {
+              console.log("Withdraw failed");
+            }
+          };
+
+          // if (tx.status == 1) {
+          //   toast.success("Face Recover Success", {
+          //     position: "top-right",
+          //     autoClose: 5000,
+          //     hideProgressBar: false,
+          //     closeOnClick: true,
+          //     progress: undefined,
+          //     theme: "dark",
+          //   });
+          // } else {
+          //   toast.error("Face Recover Failed", {
+          //     position: "top-right",
+          //     autoClose: 5000,
+          //     hideProgressBar: false,
+          //     closeOnClick: true,
+          //     progress: undefined,
+          //     theme: "dark",
+          //   });
+          // }
+
+          // console.log("persionalPoseidonHash", persionalPoseidonHash);
         } else {
-          toast.error("Face Recover Failed", {
+          toast.error("No face detected", {
             position: "top-right",
             autoClose: 5000,
             hideProgressBar: false,
@@ -182,18 +266,9 @@ export const FaceRecovery: FC<FaceProps> = () => {
             theme: "dark",
           });
         }
-
-        // console.log("persionalPoseidonHash", persionalPoseidonHash);
-      } else {
-        toast.error("No face detected", {
-          position: "top-right",
-          autoClose: 5000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          progress: undefined,
-          theme: "dark",
-        });
       }
+    } catch (error) {
+      console.log("error", error);
     }
   };
 

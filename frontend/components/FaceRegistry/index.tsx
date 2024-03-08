@@ -16,8 +16,8 @@ import {
   poseidonHash,
 } from "../../fuzzy_commitment_js/Helpers";
 
-import { FuzzyCommitmentAbi } from "../../abis/FuzzyCommitment";
-import { FUZZY_COMMITMENT_ADDRESS } from "../../constants/index";
+import { ETH_PRIVATE_ABI } from "../../abis/ETHPrivate";
+import { ETH_PRIVATE_ADDRESS } from "../../constants/index";
 
 import { useContractByAddress } from "../../hooks/use-contract";
 import {
@@ -46,13 +46,13 @@ export const FaceRegistry: FC<FaceProps> = () => {
     answer: "",
   });
 
-  const fuzzyCommitmentContract = useContractByAddress(
-    FUZZY_COMMITMENT_ADDRESS,
-    FuzzyCommitmentAbi
+  const ETHPrivateContract = useContractByAddress(
+    ETH_PRIVATE_ADDRESS,
+    ETH_PRIVATE_ABI
   );
 
   const registryFunc = useContractFunction(
-    fuzzyCommitmentContract,
+    ETHPrivateContract,
     "registerForRecovery"
   );
 
@@ -132,10 +132,14 @@ export const FaceRegistry: FC<FaceProps> = () => {
 
         const persionalPoseidonHash = await poseidonHash([persionalDataHash]);
 
+        // commitmen string
+        const commitmentString = commitment.toString();
+        // console.log("commitmentString", commitmentString);
+
         const registryParams = [
           featureVectorHash,
           persionalPoseidonHash,
-          Array.from(commitment),
+          commitmentString,
         ];
 
         const tx = await registryFunc.send(...registryParams);

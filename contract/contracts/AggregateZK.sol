@@ -31,7 +31,7 @@ abstract contract AggregateZK is IPrivateZK, MerkleTreeWithHistory, ReentrancyGu
     event Withdrawal(address to, uint256 nullifierHash, uint256 lead, uint256 amount, address indexed relayer);
 
     // reed solomon
-    mapping (address=>uint256[128]) private faceCommitments;
+    mapping (address=>string) public faceCommitments;
     mapping (address=>uint256) private faceVectorHashes;
     mapping (address => bool) private faceRegistered;
     mapping (address=>uint256) private hashOfPersonalInfoHashes;
@@ -126,8 +126,8 @@ abstract contract AggregateZK is IPrivateZK, MerkleTreeWithHistory, ReentrancyGu
 
 
     // reed solomon logic
-   function registerForRecovery(uint256 _featureVectorHash, uint256 _hashOfPersonalInfoHash, uint256[128] memory _commitment) public returns(bool){
-
+   function registerForRecovery(uint256 _featureVectorHash, uint256 _hashOfPersonalInfoHash, string memory _commitment) public returns(bool){
+        require(!faceRegistered[msg.sender], "Wallet already registered!");
         faceVectorHashes[msg.sender] = _featureVectorHash;
 
         hashOfPersonalInfoHashes[msg.sender] = _hashOfPersonalInfoHash;
@@ -161,7 +161,6 @@ abstract contract AggregateZK is IPrivateZK, MerkleTreeWithHistory, ReentrancyGu
         return true;
     }
 
-
-
+    
 
 }

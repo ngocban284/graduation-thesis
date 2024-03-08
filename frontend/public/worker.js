@@ -5,10 +5,11 @@ self.addEventListener("message", async ({ data }) => {
   const fn = data[0];
   switch (fn) {
     case "fullProveWithdraw":
-      const [_, input] = data;
+      let inputWithdraw = data[1];
+      console.log("Worker: fullProveWithdraw");
       try {
         const result = await snarkjs.groth16.fullProve(
-          input,
+          inputWithdraw,
           "./zk-resource/withdraw/Withdraw.wasm",
           "./zk-resource/withdraw/Withdraw.zkey"
         );
@@ -20,10 +21,12 @@ self.addEventListener("message", async ({ data }) => {
         break;
       }
     case "fullProveRecovery":
-      const [_, input] = data;
+      console.log("Worker: fullProveRecovery");
+      let inputRecovery = data[1];
+      console.log("inputRecovery", inputRecovery);
       try {
         const result = await snarkjs.groth16.fullProve(
-          input,
+          inputRecovery,
           "./zk-resource/reedSolomon/ReedSolomon.wasm",
           "./zk-resource/reedSolomon/ReedSolomon.zkey"
         );

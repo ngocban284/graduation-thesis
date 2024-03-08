@@ -18,7 +18,7 @@ prove_outputs = $(pf) $(inst)
 all: copy_zkey verify
 
 copy_zkey:
-	cp out/withdraw.zkey dkg.zkey
+	cp out/reedSolomon.zkey dkg.zkey
 
 $(compile_outputs): $(circom)
 	circom $< --r1cs --wasm
