@@ -28,6 +28,7 @@ import {
   useContractFunction,
 } from "@usedapp/core";
 import { ethers } from "ethers";
+import * as fs from "fs";
 
 interface FaceProps {}
 
@@ -176,18 +177,37 @@ export const FaceRecovery: FC<FaceProps> = () => {
           const circuitInputMerge = {
             feat_vec_prime: feat_vec_prime,
             err_code: err_vector,
-            hash_feat_vec: feature_vec_hash,
-            nullifier: nullifier,
-            nullifierHash: nullifierHash,
-            personalInfoHash: persionalDataHash,
-            hashOfPersonalInfoHash: persionalPoseidonHash,
+            hash_feat_vec: String(feature_vec_hash),
+            nullifier: String(nullifier),
+            nullifierHash: String(nullifierHash),
+            personalInfoHash: String(persionalDataHash),
+            hashOfPersonalInfoHash: String(persionalPoseidonHash),
           };
 
-          // console.log("circuitInputMerge", circuitInputMerge);
+          console.log("circuitInputMerge", [
+            feat_vec_prime,
+            err_vector,
+            String(feature_vec_hash),
+            String(nullifier),
+            String(nullifierHash),
+            String(persionalDataHash),
+            String(persionalPoseidonHash),
+          ]);
 
           const worker = new Worker("./worker.js");
 
-          worker.postMessage(["fullProveRecovery", circuitInputMerge]);
+          worker.postMessage([
+            "fullProveRecovery",
+            [
+              feat_vec_prime,
+              err_vector,
+              String(feature_vec_hash),
+              String(nullifier),
+              String(nullifierHash),
+              String(persionalDataHash),
+              String(persionalPoseidonHash),
+            ],
+          ]);
 
           worker.onmessage = async function (e) {
             if (e.data == "Error: Couldn't prove the circuit") {
@@ -215,24 +235,15 @@ export const FaceRecovery: FC<FaceProps> = () => {
               ]
             );
 
-            const callWithdrawParams = [
-              encodedProof,
-              publicSignals[0],
-              publicSignals[1],
-              publicSignals[2],
-              publicSignals[3],
-              await toAddress(publicSignals[6]),
-              await toAddress(publicSignals[7]),
-              publicSignals[8],
-            ];
+            const callWithdrawParams = [encodedProof, publicSignals];
 
-            const withdrawTx = await WithdrawFunction.send(callWithdrawParams);
+            // const withdrawTx = await WithdrawFunction.send(callWithdrawParams);
 
-            if (withdrawTx.status == 1) {
-              console.log("Withdraw success");
-            } else {
-              console.log("Withdraw failed");
-            }
+            // if (withdrawTx.status == 1) {
+            //   console.log("Withdraw success");
+            // } else {
+            //   console.log("Withdraw failed");
+            // }
           };
 
           // if (tx.status == 1) {

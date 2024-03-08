@@ -22,15 +22,33 @@ self.addEventListener("message", async ({ data }) => {
       }
     case "fullProveRecovery":
       console.log("Worker: fullProveRecovery");
-      let inputRecovery = data[1];
-      console.log("inputRecovery", inputRecovery);
+      let feat_vec_prime = data[1][0];
+      let err_vector = data[1][1];
+      let hash_feat_vec = data[1][2];
+      let nullifier = data[1][3];
+      let nullifierHash = data[1][4];
+      let personalInfoHash = data[1][5];
+      let hashOfPersonalInfoHash = data[1][6];
+
+      console.log("inputs", err_vector);
+
       try {
+        const inputs = {
+          err_code: [...err_vector],
+          feat_vec_prime: [...feat_vec_prime],
+          hash_feat_vec: hash_feat_vec,
+          nullifier: nullifier,
+          nullifierHash: nullifierHash,
+          personalInfoHash: personalInfoHash,
+          hashOfPersonalInfoHash: hashOfPersonalInfoHash,
+        };
+        console.log("cc", cc);
         const result = await snarkjs.groth16.fullProve(
-          inputRecovery,
+          inputs,
           "./zk-resource/reedSolomon/ReedSolomon.wasm",
           "./zk-resource/reedSolomon/ReedSolomon.zkey"
         );
-
+        console.log("result", result);
         postMessage(result);
         break;
       } catch (e) {
