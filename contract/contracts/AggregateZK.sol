@@ -32,9 +32,9 @@ abstract contract AggregateZK is IPrivateZK, MerkleTreeWithHistory, ReentrancyGu
 
     // reed solomon
     mapping (address=>string) public faceCommitments;
-    mapping (address=>uint256) private faceVectorHashes;
+    mapping (address=>uint256) public faceVectorHashes;
     mapping (address => bool) private faceRegistered;
-    mapping (address=>uint256) private hashOfPersonalInfoHashes;
+    mapping (address=>uint256) public hashOfPersonalInfoHashes;
     mapping (uint256 => uint256 ) private faceVectorHashtoRemainAmount;
     mapping (uint256 => bool) private usedNullifierHash;
 
@@ -160,6 +160,23 @@ abstract contract AggregateZK is IPrivateZK, MerkleTreeWithHistory, ReentrancyGu
         emit WalletRecovered(_wallet,msg.sender, _input[1], amount);
         return true;
     }
+
+   function recoverWallet1(bytes memory proofs, uint256[] memory _input,address _wallet) public returns(bool){
+        require(faceRegistered[_wallet], "Wallet not registered for recovery");
+        require(IVerifier(state.verifier).verifyProof(OPCODE_RECOVERY, proofs, _input), "Invalid proof");
+  
+    }
+
+       function recoverWallet2(bytes memory proofs, uint256[] memory _input,address _wallet) public returns(bool){
+        require(faceRegistered[_wallet], "Wallet not registered for recovery");
+        require(IVerifier(state.verifier).verifyProof(OPCODE_RECOVERY, proofs, _input), "Invalid proof");
+        require(_input[0] == faceVectorHashes[_wallet], "Invalid feature vector hash");
+        require(_input[2] == hashOfPersonalInfoHashes[_wallet], "Invalid hash of personal info hash");
+        require(!usedNullifierHash[_input[1]], "Nullifier hash already used");
+        
+        return true;
+    }
+
 
     
 

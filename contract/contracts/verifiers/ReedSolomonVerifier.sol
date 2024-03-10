@@ -19,6 +19,7 @@
 */
 
 pragma solidity >=0.7.0 <0.9.0;
+import "hardhat/console.sol";
 
 contract Groth16VerifierReedSolomon {
     // Scalar field size
@@ -62,10 +63,10 @@ contract Groth16VerifierReedSolomon {
 
     uint16 constant pLastMem = 896;
 
+
     function publicInputsLength() external pure returns (uint256) {
         return 3;
     }
-
 
     function verifyProof(uint[2] calldata _pA, uint[2][2] calldata _pB, uint[2] calldata _pC, uint[3] calldata _pubSignals) public view returns (bool) {
         assembly {

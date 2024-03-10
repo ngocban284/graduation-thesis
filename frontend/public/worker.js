@@ -1,5 +1,4 @@
 importScripts("./snarkjs.min.js");
-// const snarkjs = require("snarkjs");
 
 self.addEventListener("message", async ({ data }) => {
   const fn = data[0];
@@ -30,8 +29,6 @@ self.addEventListener("message", async ({ data }) => {
       let personalInfoHash = data[1][5];
       let hashOfPersonalInfoHash = data[1][6];
 
-      console.log("inputs", err_vector);
-
       try {
         const inputs = {
           err_code: [...err_vector],
@@ -42,13 +39,11 @@ self.addEventListener("message", async ({ data }) => {
           personalInfoHash: personalInfoHash,
           hashOfPersonalInfoHash: hashOfPersonalInfoHash,
         };
-        console.log("cc", cc);
         const result = await snarkjs.groth16.fullProve(
           inputs,
           "./zk-resource/reedSolomon/ReedSolomon.wasm",
           "./zk-resource/reedSolomon/ReedSolomon.zkey"
         );
-        console.log("result", result);
         postMessage(result);
         break;
       } catch (e) {

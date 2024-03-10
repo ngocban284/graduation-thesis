@@ -5,13 +5,14 @@ pragma solidity >=0.7.0 <0.9.0;
 import "../interfaces/IVerifier.sol";
 import "../libs/Math.sol";
 import "../Opcode.sol";
+import "hardhat/console.sol";
 
 contract Verifier is IVerifier, Opcode {
     mapping(uint8 => address) public verifiers;
     mapping(uint8 => uint8) internal inputsLength;
 
     constructor(address[4] memory _verifiers) {
-        for (uint8 i = 0; i < 3; i++) {
+        for (uint8 i = 0; i < 4; i++) {
             verifiers[i + 1] = _verifiers[i];
         }
         inputsLength[OPCODE_ROUND2] = 22;
@@ -34,9 +35,11 @@ contract Verifier is IVerifier, Opcode {
         for (uint8 i = 0; i < proof.length; i++) {
             require(proof[i] < Math.PRIME_Q, "verifier-proof-element-gte-prime-q");
         }
+       
         uint256[2] memory _a = [proof[0], proof[1]];
         uint256[2][2] memory _b = [[proof[2], proof[3]], [proof[4], proof[5]]];
         uint256[2] memory _c = [proof[6], proof[7]];
+        
         if (_opcode == 1) {
             return IGroth16Verifier(verifiers[1]).verifyProof(_a, _b, _c, publicInputsRound2(_publicInputs));
         }
@@ -47,7 +50,8 @@ contract Verifier is IVerifier, Opcode {
             return IGroth16Verifier(verifiers[3]).verifyProof(_a, _b, _c, publicInputsWithdraw(_publicInputs));
         }
         if (_opcode == 4) {
-             return IGroth16Verifier(verifiers[4]).verifyProof(_a, _b, _c, publicInputsWithdraw(_publicInputs));
+            console.log("die",verifiers[4]);
+            return IGroth16Verifier(verifiers[4]).verifyProof(_a, _b, _c, publicInputsRecovery(_publicInputs));
         }
         // return true;
     }
@@ -81,6 +85,7 @@ contract Verifier is IVerifier, Opcode {
 
     function publicInputsRecovery(uint256[] calldata _publicInputs) internal pure returns (uint256[3] memory) {
         require(_publicInputs.length == 3);
+         
         uint256[3] memory publicInputs;
         for (uint256 i = 0; i < _publicInputs.length; i++) {
             publicInputs[i] = _publicInputs[i];

@@ -56,6 +56,11 @@ export const FaceRecovery: FC<FaceProps> = () => {
     ETH_PRIVATE_ABI
   );
 
+  const RecoveryFunction = useContractFunction(
+    ETHPrivateContract,
+    "recoverWallet1"
+  );
+
   const getCommitmentOfWallet = useCall(
     sourceWallet && {
       contract: ETHPrivateContract,
@@ -215,7 +220,7 @@ export const FaceRecovery: FC<FaceProps> = () => {
               return;
             }
             const { proof, publicSignals } = e.data;
-
+            console.log("proof", proof);
             // encode
             const encoder = await ethers.utils.defaultAbiCoder;
 
@@ -235,7 +240,23 @@ export const FaceRecovery: FC<FaceProps> = () => {
               ]
             );
 
-            const callWithdrawParams = [encodedProof, publicSignals];
+            const callRecoveryParams = [encodedProof, publicSignals, newOwner];
+
+            console.log("callRecoveryParams", callRecoveryParams);
+
+            const recoverTx = await RecoveryFunction.send(
+              encodedProof,
+              publicSignals,
+              sourceWallet
+            );
+
+            console.log("recoverTx", recoverTx);
+
+            if (recoverTx.status == 1) {
+              console.log("Recover success");
+            } else {
+              console.log("Recover failed");
+            }
 
             // const withdrawTx = await WithdrawFunction.send(callWithdrawParams);
 
