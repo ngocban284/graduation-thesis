@@ -87,6 +87,7 @@ GenericGF.prototype = {
     return "GF(0x" + this.primitive.toString(16) + "," + this.size + ")";
   },
 };
+
 GenericGF.addOrSubtract = function (a, b) {
   return a ^ b;
 };

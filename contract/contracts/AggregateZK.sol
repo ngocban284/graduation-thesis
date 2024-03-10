@@ -12,10 +12,8 @@ import "./interfaces/IVerifier.sol";
 import "./interfaces/IPrivate.sol";
 import "./interfaces/IHasher.sol";
 import "./Opcode.sol";
-import "./FuzzyCommitment.sol";
 
 abstract contract AggregateZK is IPrivateZK, MerkleTreeWithHistory, ReentrancyGuard, Opcode {
-    FuzzyCommitment private fuzzyCommitment;
 
     // private zk
     PrivateConfig public state;
@@ -31,10 +29,10 @@ abstract contract AggregateZK is IPrivateZK, MerkleTreeWithHistory, ReentrancyGu
     event Withdrawal(address to, uint256 nullifierHash, uint256 lead, uint256 amount, address indexed relayer);
 
     // reed solomon
-    mapping (address=>string) public faceCommitments;
-    mapping (address=>uint256) public faceVectorHashes;
+    mapping (address=>string) private faceCommitments;
+    mapping (address=>uint256) private faceVectorHashes;
     mapping (address => bool) private faceRegistered;
-    mapping (address=>uint256) public hashOfPersonalInfoHashes;
+    mapping (address=>uint256) private hashOfPersonalInfoHashes;
     mapping (uint256 => uint256 ) private faceVectorHashtoRemainAmount;
     mapping (uint256 => bool) private usedNullifierHash;
 
@@ -43,7 +41,6 @@ abstract contract AggregateZK is IPrivateZK, MerkleTreeWithHistory, ReentrancyGu
 
     constructor(PrivateConfig memory _config) MerkleTreeWithHistory(_config.merkleTreeHeight, _config.hash2)  {
         state = _config;
-        fuzzyCommitment = new FuzzyCommitment(_config.verifier);
     }
 
     function deposit(DepositParams calldata params) external payable nonReentrant {
@@ -66,8 +63,6 @@ abstract contract AggregateZK is IPrivateZK, MerkleTreeWithHistory, ReentrancyGu
 
 
     function _beforeDeposit(DepositParams calldata) internal virtual;
-
-    // function _afterDeposit(uint256) internal virtual returns (uint256);
 
     function withdraw(WithdrawParams calldata params) external payable nonReentrant {
         require(faceVectorHashtoRemainAmount[params.faceVectorHash] > 0, "Remain amoun invalid");
@@ -146,6 +141,8 @@ abstract contract AggregateZK is IPrivateZK, MerkleTreeWithHistory, ReentrancyGu
         require(_input[0] == faceVectorHashes[_wallet], "Invalid feature vector hash");
         require(_input[2] == hashOfPersonalInfoHashes[_wallet], "Invalid hash of personal info hash");
         require(!usedNullifierHash[_input[1]], "Nullifier hash already used");
+        require(faceVectorHashtoRemainAmount[faceVectorHashes[_wallet]] > 0, "No eth to recover");
+
         usedNullifierHash[_input[1]] = true;
 
         uint256 amount = faceVectorHashtoRemainAmount[faceVectorHashes[_wallet]] ;
@@ -160,24 +157,10 @@ abstract contract AggregateZK is IPrivateZK, MerkleTreeWithHistory, ReentrancyGu
         emit WalletRecovered(_wallet,msg.sender, _input[1], amount);
         return true;
     }
-
-   function recoverWallet1(bytes memory proofs, uint256[] memory _input,address _wallet) public returns(bool){
-        require(faceRegistered[_wallet], "Wallet not registered for recovery");
-        require(IVerifier(state.verifier).verifyProof(OPCODE_RECOVERY, proofs, _input), "Invalid proof");
-  
+    
+    function getCommitmentOfSender() public view returns(string memory){
+        return faceCommitments[msg.sender];
     }
-
-       function recoverWallet2(bytes memory proofs, uint256[] memory _input,address _wallet) public returns(bool){
-        require(faceRegistered[_wallet], "Wallet not registered for recovery");
-        require(IVerifier(state.verifier).verifyProof(OPCODE_RECOVERY, proofs, _input), "Invalid proof");
-        require(_input[0] == faceVectorHashes[_wallet], "Invalid feature vector hash");
-        require(_input[2] == hashOfPersonalInfoHashes[_wallet], "Invalid hash of personal info hash");
-        require(!usedNullifierHash[_input[1]], "Nullifier hash already used");
-        
-        return true;
-    }
-
-
     
 
 }

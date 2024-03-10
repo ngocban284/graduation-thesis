@@ -215,77 +215,67 @@ export const FaceRecovery: FC<FaceProps> = () => {
           ]);
 
           worker.onmessage = async function (e) {
-            if (e.data == "Error: Couldn't prove the circuit") {
-              console.log("Error: Couldn't prove the circuit");
-              return;
-            }
-            const { proof, publicSignals } = e.data;
-            console.log("proof", proof);
-            // encode
-            const encoder = await ethers.utils.defaultAbiCoder;
+            try {
+              if (e.data == "Error: Couldn't prove the circuit") {
+                console.log("Error: Couldn't prove the circuit");
+                return;
+              }
+              const { proof, publicSignals } = e.data;
 
-            const encodedProof = encoder.encode(
-              ["uint256[8]"],
-              [
+              // encode
+              const encoder = await ethers.utils.defaultAbiCoder;
+
+              const encodedProof = encoder.encode(
+                ["uint256[8]"],
                 [
-                  BigInt(proof.pi_a[0]),
-                  BigInt(proof.pi_a[1]),
-                  BigInt(proof.pi_b[0][1]),
-                  BigInt(proof.pi_b[0][0]),
-                  BigInt(proof.pi_b[1][1]),
-                  BigInt(proof.pi_b[1][0]),
-                  BigInt(proof.pi_c[0]),
-                  BigInt(proof.pi_c[1]),
-                ],
-              ]
-            );
+                  [
+                    BigInt(proof.pi_a[0]),
+                    BigInt(proof.pi_a[1]),
+                    BigInt(proof.pi_b[0][1]),
+                    BigInt(proof.pi_b[0][0]),
+                    BigInt(proof.pi_b[1][1]),
+                    BigInt(proof.pi_b[1][0]),
+                    BigInt(proof.pi_c[0]),
+                    BigInt(proof.pi_c[1]),
+                  ],
+                ]
+              );
 
-            const callRecoveryParams = [encodedProof, publicSignals, newOwner];
+              const callRecoveryParams = [
+                encodedProof,
+                publicSignals,
+                newOwner,
+              ];
 
-            console.log("callRecoveryParams", callRecoveryParams);
+              const recoverTx = await RecoveryFunction.send(
+                encodedProof,
+                publicSignals,
+                sourceWallet
+              );
 
-            const recoverTx = await RecoveryFunction.send(
-              encodedProof,
-              publicSignals,
-              sourceWallet
-            );
-
-            console.log("recoverTx", recoverTx);
-
-            if (recoverTx.status == 1) {
-              console.log("Recover success");
-            } else {
-              console.log("Recover failed");
+              if (recoverTx.status == 1) {
+                toast.success("Face Recover Success", {
+                  position: "top-right",
+                  autoClose: 5000,
+                  hideProgressBar: false,
+                  closeOnClick: true,
+                  progress: undefined,
+                  theme: "dark",
+                });
+              } else {
+                toast.error("Face Recover Failed", {
+                  position: "top-right",
+                  autoClose: 5000,
+                  hideProgressBar: false,
+                  closeOnClick: true,
+                  progress: undefined,
+                  theme: "dark",
+                });
+              }
+            } catch (error) {
+              console.log("error", error);
             }
-
-            // const withdrawTx = await WithdrawFunction.send(callWithdrawParams);
-
-            // if (withdrawTx.status == 1) {
-            //   console.log("Withdraw success");
-            // } else {
-            //   console.log("Withdraw failed");
-            // }
           };
-
-          // if (tx.status == 1) {
-          //   toast.success("Face Recover Success", {
-          //     position: "top-right",
-          //     autoClose: 5000,
-          //     hideProgressBar: false,
-          //     closeOnClick: true,
-          //     progress: undefined,
-          //     theme: "dark",
-          //   });
-          // } else {
-          //   toast.error("Face Recover Failed", {
-          //     position: "top-right",
-          //     autoClose: 5000,
-          //     hideProgressBar: false,
-          //     closeOnClick: true,
-          //     progress: undefined,
-          //     theme: "dark",
-          //   });
-          // }
 
           // console.log("persionalPoseidonHash", persionalPoseidonHash);
         } else {
