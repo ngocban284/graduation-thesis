@@ -1,0 +1,8 @@
+{
+  "arbitrum-sepolia": {
+    "ETHPrivate": {
+      "address": "0x09D94F32Dc76bbbd5aFdf27451daD208E90652cE",
+      "startBlock": 15773157
+    }
+  }
+}
